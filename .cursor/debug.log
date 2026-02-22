@@ -1,0 +1,163 @@
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378497981,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378498030,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378498122,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378498122,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378498137,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378498137,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378498145,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378498145,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378498148,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378498149,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378498151,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378498151,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378498152,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378498152,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378498248,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378498252,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378498256,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378498256,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378498259,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378498261,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378498260,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378498261,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378498264,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378498264,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378498266,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378498267,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378498267,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378498268,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378501845,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378501974,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378501989,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378501975,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378501990,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378501996,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378501996,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378503017,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378503017,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378503018,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378503019,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378503055,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378503056,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378503056,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378503056,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378503069,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378503070,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378503070,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378503070,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378503342,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":false,"hasUser":false},"timestamp":1769378503343,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378503343,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":false,"hasUser":false},"timestamp":1769378503344,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378503350,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{"isSignedIn":false},"timestamp":1769378503351,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378503351,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{"isSignedIn":false},"timestamp":1769378503351,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378521459,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378521466,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378521469,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378521466,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378521470,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378521471,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378521471,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378522283,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378522284,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378522285,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378522285,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522323,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378522323,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522324,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378522324,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378522331,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378522332,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378522332,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378522332,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522396,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378522397,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522397,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378522398,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522414,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:12","message":"useUser hook error","data":{"errorMessage":"Cannot read properties of null (reading 'useContext')","errorName":"TypeError"},"timestamp":1769378522415,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522430,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378522431,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378522431,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378522431,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378612701,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378612811,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378612811,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378612824,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378612825,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378612829,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{},"timestamp":1769378612830,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378633385,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378633535,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378633520,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378633537,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378633519,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378634181,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378634182,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378634183,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378634183,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634286,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378634286,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634286,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378634287,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634323,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378634323,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634324,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378634324,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634504,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378634505,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634505,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378634505,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634583,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378634584,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378634584,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378634584,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635694,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635694,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635695,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635695,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"layout.tsx:18","message":"RootLayout server-side env check","data":{"hasPublishableKey":true,"hasSecretKey":true,"publishableKeyLength":55,"secretKeyLength":50,"publishableKeyPrefix":"pk_test_aW1wcm9","publishableKeySuffix":"RldiQ","secretKeyPrefix":"sk_test_pIFjuzW"},"timestamp":1769378635816,"sessionId":"debug-session","runId":"run1","hypothesisId":"A"}
+{"location":"Providers.tsx:10","message":"Providers component rendering","data":{"hasPublishableKey":true,"keyLength":55,"keyPrefix":"pk_test_aW","keySuffix":"RldiQ"},"timestamp":1769378635845,"sessionId":"debug-session","runId":"run1","hypothesisId":"B"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635849,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"Providers.tsx:15","message":"Before ClerkProvider render","data":{},"timestamp":1769378635845,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":false,"hasUser":false},"timestamp":1769378635850,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635886,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635887,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635887,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635887,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635945,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635946,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635946,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635947,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635999,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635999,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378635999,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378635999,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378636001,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{"isSignedIn":true},"timestamp":1769378636001,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378636002,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{"isSignedIn":true},"timestamp":1769378636002,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769378636012,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:12","message":"useUser hook error in Home","data":{"errorMessage":"Cannot read properties of null (reading 'useContext')","errorName":"TypeError"},"timestamp":1769378636013,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378720861,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378720861,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378720861,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378720862,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378720868,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378720869,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378720869,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378720869,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378720903,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378720903,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769378720903,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769378720904,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769379638121,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769379638124,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{"isSignedIn":true},"timestamp":1769379638124,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769379638121,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:7","message":"AuthButton component rendering","data":{},"timestamp":1769379638122,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"AuthButton.tsx:18","message":"useUser hook result","data":{"isLoaded":true,"isSignedIn":true,"hasUser":true},"timestamp":1769379638122,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:7","message":"Home page rendering","data":{},"timestamp":1769379638123,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
+{"location":"page.tsx:18","message":"Home page useUser result","data":{"isSignedIn":true},"timestamp":1769379638123,"sessionId":"debug-session","runId":"run1","hypothesisId":"C"}
