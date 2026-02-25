@@ -1,33 +1,44 @@
 import { supabase, type Portfolio, type Holding, type Transaction } from './supabase'
 
-// Get or create portfolio for a user
-export async function getOrCreatePortfolio(userId: string): Promise<Portfolio> {
-  // Try to get existing portfolio
-  const { data: existing, error: fetchError } = await supabase
+export type { Holding, Transaction }
+
+// Get portfolio for a user without creating (returns null if none)
+export async function getPortfolio(userId: string): Promise<Portfolio | null> {
+  const { data, error } = await supabase
     .from('portfolios')
     .select('*')
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
+  if (error) throw new Error(`Failed to fetch portfolio: ${error.message}`)
+  return data
+}
 
-  if (existing && !fetchError) {
-    return existing
-  }
-
-  // Create new portfolio if doesn't exist
-  const { data: newPortfolio, error: createError } = await supabase
+// Create a new portfolio with chosen starting cash (for simulator)
+export async function createPortfolio(userId: string, initialCash: number): Promise<Portfolio> {
+  const { data, error } = await supabase
     .from('portfolios')
     .insert({
       user_id: userId,
-      cash_balance: 10000.00, // Starting cash
+      cash_balance: Math.max(0, Number(initialCash)),
     })
     .select()
     .single()
+  if (error || !data) throw new Error(`Failed to create portfolio: ${error?.message}`)
+  return data
+}
 
-  if (createError || !newPortfolio) {
-    throw new Error(`Failed to create portfolio: ${createError?.message}`)
-  }
+// Reset simulator: set cash and clear all holdings and transactions
+export async function resetSimulator(portfolioId: string, newCash: number): Promise<void> {
+  await supabase.from('holdings').delete().eq('portfolio_id', portfolioId)
+  await supabase.from('transactions').delete().eq('portfolio_id', portfolioId)
+  await updateCashBalance(portfolioId, Math.max(0, Number(newCash)))
+}
 
-  return newPortfolio
+// Get or create portfolio for a user (creates with default 10k if none)
+export async function getOrCreatePortfolio(userId: string): Promise<Portfolio> {
+  const existing = await getPortfolio(userId)
+  if (existing) return existing
+  return createPortfolio(userId, 10000)
 }
 
 // Get all holdings for a portfolio

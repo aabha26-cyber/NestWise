@@ -1,75 +1,128 @@
+'use client'
+
+import { useState } from 'react'
 import Link from 'next/link'
+import { courses, type Course, type Lesson, type Resource } from '@/lib/courses'
 
-const lessons = [
-  {
-    id: 1,
-    title: 'What is a Stock?',
-    icon: '📈',
-    content: `A stock represents ownership in a company. When you buy a stock, you're buying a small piece of that company. If the company does well and becomes more valuable, your stock might increase in value too. If the company struggles, your stock might decrease in value.
+function ResourceLink({ resource }: { resource: Resource }) {
+  const isVideo = resource.type === 'video'
+  return (
+    <a
+      href={resource.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-start gap-3 p-3 rounded-lg bg-dark-surface hover:bg-dark-card border border-dark-border hover:border-dark-accent-green/50 transition-all group"
+    >
+      <span className="text-xl shrink-0">{isVideo ? '▶️' : '📄'}</span>
+      <div className="min-w-0">
+        <p className="font-medium text-dark-text-primary group-hover:text-dark-accent-green transition-colors">
+          {resource.title}
+        </p>
+        <p className="text-sm text-dark-text-secondary">{resource.source}</p>
+        {resource.description && (
+          <p className="text-xs text-dark-text-muted mt-1">{resource.description}</p>
+        )}
+      </div>
+      <span className="text-dark-text-muted text-sm shrink-0">↗</span>
+    </a>
+  )
+}
 
-Stocks are traded on stock exchanges, and their prices change throughout the day based on supply and demand. It's important to remember that stock prices can be volatile and there's always risk involved.`,
-  },
-  {
-    id: 2,
-    title: 'ETFs Explained',
-    icon: '📦',
-    content: `An ETF (Exchange-Traded Fund) is like a basket that holds many different stocks, bonds, or other investments. When you buy an ETF, you're buying a small piece of that entire basket.
+function LessonCard({ lesson, defaultOpen = false }: { lesson: Lesson; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen)
+  const hasResources = (lesson.articles?.length ?? 0) + (lesson.videos?.length ?? 0) > 0
+  return (
+    <div className="border border-dark-border rounded-xl overflow-hidden bg-dark-card">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-4 p-4 text-left hover:bg-dark-surface/50 transition-colors"
+      >
+        <span className="text-2xl">{lesson.icon}</span>
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-dark-text-primary">{lesson.title}</h3>
+          {hasResources && (
+            <p className="text-sm text-dark-text-secondary mt-0.5">
+              {lesson.articles?.length ?? 0} article{(lesson.articles?.length ?? 0) !== 1 ? 's' : ''},{' '}
+              {lesson.videos?.length ?? 0} video{(lesson.videos?.length ?? 0) !== 1 ? 's' : ''}
+            </p>
+          )}
+        </div>
+        <span className="text-dark-text-muted">{open ? '▼' : '▶'}</span>
+      </button>
+      {open && (
+        <div className="px-4 pb-4 pt-0 border-t border-dark-border">
+          <p className="text-dark-text-secondary leading-relaxed whitespace-pre-line pt-4">
+            {lesson.content}
+          </p>
+          {hasResources && (
+            <div className="mt-6 space-y-4">
+              <h4 className="text-sm font-semibold text-dark-text-primary uppercase tracking-wide">
+                Worth reading & watching
+              </h4>
+              <div className="grid gap-2">
+                {lesson.articles?.map((a) => (
+                  <ResourceLink key={a.url} resource={a} />
+                ))}
+                {lesson.videos?.map((v) => (
+                  <ResourceLink key={v.url} resource={v} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
-ETFs can help with diversification because you're spreading your investment across many companies or assets rather than just one. They're traded like stocks on exchanges, but they give you exposure to a whole collection of investments. Some people find ETFs simpler than picking individual stocks.`,
-  },
-  {
-    id: 3,
-    title: 'Risk vs Reward',
-    icon: '⚖️',
-    content: `All investments carry some level of risk. Generally, the potential for higher returns comes with higher risk. Stocks can be volatile—their prices go up and down, sometimes significantly.
-
-Bonds are often considered less risky than stocks, but they typically offer lower potential returns. It's important to understand your own risk tolerance—how comfortable you are with the possibility of losing money. Only invest money you can afford to lose, and remember that past performance doesn't guarantee future results.`,
-  },
-  {
-    id: 4,
-    title: 'Diversification',
-    icon: '🎯',
-    content: `Diversification means spreading your investments across different types of assets, industries, or companies. The idea is that if one investment performs poorly, others might perform better, which can help reduce overall risk.
-
-Think of it as "not putting all your eggs in one basket." However, diversification doesn't guarantee profits or protect against all losses. It's one strategy to consider, but it's important to do your own research and understand what you're investing in.`,
-  },
-  {
-    id: 5,
-    title: 'Market Basics',
-    icon: '🏛️',
-    content: `Stock markets are places where stocks are bought and sold. The price of a stock is determined by supply and demand—if more people want to buy a stock than sell it, the price goes up. If more people want to sell than buy, the price goes down.
-
-Markets can be influenced by many factors: company performance, economic news, investor sentiment, and more. It's normal for markets to go up and down over time.`,
-  },
-  {
-    id: 6,
-    title: 'Getting Started',
-    icon: '🚀',
-    content: `If you're new to investing, start by learning the basics. Understand what you're investing in, do your research, and never invest more than you can afford to lose.
-
-Consider starting with a small amount and learning as you go. Many people find it helpful to use simulation tools (like this app!) to practice before investing real money. Remember, there's no rush—take your time to learn and understand.`,
-  },
-]
+function CourseSection({ course }: { course: Course }) {
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <div className="card">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-start gap-4 text-left"
+      >
+        <span className="text-4xl">{course.icon}</span>
+        <div className="flex-1 min-w-0">
+          <h2 className="text-xl font-bold text-dark-text-primary">{course.title}</h2>
+          <p className="text-dark-text-secondary mt-1">{course.description}</p>
+        </div>
+        <span className="text-dark-text-muted shrink-0">{expanded ? '▼' : '▶'}</span>
+      </button>
+      {expanded && (
+        <div className="mt-6 space-y-6">
+          {course.modules.map((mod) => (
+            <div key={mod.title}>
+              <h3 className="text-sm font-semibold text-dark-accent-green uppercase tracking-wide mb-3">
+                {mod.title}
+              </h3>
+              <div className="space-y-3">
+                {mod.lessons.map((lesson) => (
+                  <LessonCard key={lesson.id} lesson={lesson} />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function Learn() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-dark-text-primary mb-4">Learn the Basics</h1>
+        <h1 className="text-4xl font-bold text-dark-text-primary mb-4">Learn Investing</h1>
         <p className="text-xl text-dark-text-secondary max-w-2xl mx-auto">
-          Simple, beginner-friendly explanations to help you understand investing.
+          Structured courses with articles and videos for beginners. Take your time and explore.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {lessons.map((lesson) => (
-          <div key={lesson.id} className="card hover:border-dark-accent-green/50 transition-all duration-300">
-            <div className="text-4xl mb-4">{lesson.icon}</div>
-            <h2 className="text-xl font-semibold text-dark-text-primary mb-4">{lesson.title}</h2>
-            <p className="text-dark-text-secondary leading-relaxed whitespace-pre-line">
-              {lesson.content}
-            </p>
-          </div>
+      <div className="space-y-4">
+        {courses.map((course) => (
+          <CourseSection key={course.id} course={course} />
         ))}
       </div>
 
@@ -81,9 +134,10 @@ export default function Learn() {
 
       <div className="mt-12 p-6 bg-dark-surface/50 border border-dark-border rounded-lg">
         <p className="text-sm text-dark-text-muted text-center">
-          <strong className="text-dark-text-secondary">Remember:</strong> This content is for 
-          educational purposes only and does not constitute financial advice. Always consult with 
-          a qualified financial advisor before making investment decisions.
+          <strong className="text-dark-text-secondary">Remember:</strong> This content is for
+          educational purposes only and does not constitute financial advice. External links go to
+          Investopedia, SEC, Khan Academy, and other trusted sources. Always consult a qualified
+          financial advisor before making investment decisions.
         </p>
       </div>
     </div>

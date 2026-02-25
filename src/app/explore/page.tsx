@@ -12,9 +12,12 @@ export default function Explore() {
   const [stocks, setStocks] = useState<StockData[]>([])
   const [loading, setLoading] = useState(false)
   const [watchlistStatus, setWatchlistStatus] = useState<Map<string, boolean>>(new Map())
+  const [aiOverview, setAiOverview] = useState<string | null>(null)
+  const [aiOverviewLoading, setAiOverviewLoading] = useState(false)
 
   useEffect(() => {
-    loadStocks()
+    const t = setTimeout(() => loadStocks(), searchQuery.trim() ? 350 : 0)
+    return () => clearTimeout(t)
   }, [searchQuery])
 
   useEffect(() => {
@@ -28,7 +31,7 @@ export default function Explore() {
       setLoading(true)
       const results = await searchStocks(searchQuery)
       setStocks(results)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading stocks:', error)
     } finally {
       setLoading(false)
@@ -47,15 +50,38 @@ export default function Explore() {
   }
 
   const handleStockClick = async (stock: StockData) => {
-    // Fetch full details if not already loaded
+    setAiOverview(null)
     if (!stock.description) {
       const fullStock = await getStockData(stock.symbol)
       if (fullStock) {
         setSelectedStock(fullStock)
+        fetchAiOverview(fullStock)
         return
       }
     }
     setSelectedStock(stock)
+    fetchAiOverview(stock)
+  }
+
+  const fetchAiOverview = async (stock: StockData) => {
+    setAiOverviewLoading(true)
+    try {
+      const res = await fetch('/api/stock-overview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          symbol: stock.symbol,
+          name: stock.name,
+          description: stock.description ?? undefined,
+        }),
+      })
+      const data = await res.json()
+      if (data.overview) setAiOverview(data.overview)
+    } catch (e) {
+      console.error('AI overview error:', e)
+    } finally {
+      setAiOverviewLoading(false)
+    }
   }
 
   const handleToggleWatchlist = async (symbol: string, e: React.MouseEvent) => {
@@ -79,13 +105,16 @@ export default function Explore() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-dark-text-primary mb-8">Stock Explorer</h1>
+      <h1 className="text-3xl font-bold text-dark-text-primary mb-2">Stock Explorer</h1>
+      <p className="text-dark-text-secondary mb-8">
+        Search stocks worldwide by company name or symbol. Click any stock for price, AI overview, and more.
+      </p>
 
       {/* Search Bar */}
       <div className="mb-8">
         <input
           type="text"
-          placeholder="Search stocks by symbol (e.g., AAPL, TSLA, MSFT)"
+          placeholder="Search by company name or symbol (e.g., Apple, AAPL, Tesla, Samsung, LVMH)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full max-w-2xl mx-auto block bg-dark-surface border border-dark-border rounded-lg px-6 py-4 text-dark-text-primary placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-dark-accent-green focus:border-transparent"
@@ -103,7 +132,7 @@ export default function Explore() {
         /* Stock Detail View */
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => setSelectedStock(null)}
+            onClick={() => { setSelectedStock(null); setAiOverview(null) }}
             className="mb-6 text-dark-text-secondary hover:text-dark-text-primary transition-colors"
           >
             ← Back to search
@@ -148,8 +177,36 @@ export default function Explore() {
               </div>
             )}
 
+            {/* AI Overview */}
+            <div className="border-t border-dark-border pt-6">
+              <h3 className="text-lg font-semibold text-dark-text-primary mb-2 flex items-center gap-2">
+                <span className="text-xl">🤖</span> AI Overview
+              </h3>
+              {aiOverviewLoading && (
+                <div className="flex items-center gap-2 text-dark-text-secondary">
+                  <div className="w-4 h-4 border-2 border-dark-accent-green border-t-transparent rounded-full animate-spin" />
+                  <span>Generating overview...</span>
+                </div>
+              )}
+              {!aiOverviewLoading && aiOverview && (
+                <div className="space-y-4">
+                  <p className="text-dark-text-secondary leading-relaxed whitespace-pre-line">
+                    {aiOverview}
+                  </p>
+                  <p className="text-xs text-dark-text-muted italic">
+                    Not financial advice. For education only.
+                  </p>
+                </div>
+              )}
+              {!aiOverviewLoading && !aiOverview && (
+                <p className="text-dark-text-muted text-sm">
+                  AI overview unavailable. Check back later or ask in Ask AI.
+                </p>
+              )}
+            </div>
+
             {selectedStock.description && (
-              <div className="space-y-6">
+              <div className="space-y-6 border-t border-dark-border pt-6">
                 <div>
                   <h3 className="text-lg font-semibold text-dark-text-primary mb-2">About</h3>
                   <p className="text-dark-text-secondary leading-relaxed">
@@ -171,7 +228,9 @@ export default function Explore() {
             )}
 
             {!selectedStock.description && (
-              <p className="text-dark-text-secondary">Loading company information...</p>
+              <p className="text-dark-text-secondary border-t border-dark-border pt-6">
+                Loading company information...
+              </p>
             )}
           </div>
         </div>
@@ -180,7 +239,8 @@ export default function Explore() {
         <>
           {!loading && stocks.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-dark-text-secondary">No stocks found. Try searching for a stock symbol.</p>
+              <p className="text-dark-text-secondary mb-2">No stocks found.</p>
+              <p className="text-dark-text-muted text-sm">Try a company name (e.g. Apple, Samsung) or symbol (e.g. AAPL, 005930.KS).</p>
             </div>
           )}
           {!loading && stocks.length > 0 && (

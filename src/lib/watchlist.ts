@@ -1,5 +1,7 @@
 import { supabase, type WatchlistItem } from './supabase'
 
+export type { WatchlistItem }
+
 // Get user's watchlist
 export async function getWatchlist(userId: string): Promise<WatchlistItem[]> {
   const { data, error } = await supabase
