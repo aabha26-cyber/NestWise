@@ -4,6 +4,7 @@ export type { WatchlistItem }
 
 // Get user's watchlist
 export async function getWatchlist(userId: string): Promise<WatchlistItem[]> {
+  if (!supabase) return []
   const { data, error } = await supabase
     .from('watchlists')
     .select('*')
@@ -19,6 +20,7 @@ export async function getWatchlist(userId: string): Promise<WatchlistItem[]> {
 
 // Add stock to watchlist
 export async function addToWatchlist(userId: string, symbol: string): Promise<WatchlistItem> {
+  if (!supabase) throw new Error('Supabase not configured')
   const { data, error } = await supabase
     .from('watchlists')
     .insert({
@@ -47,6 +49,7 @@ export async function addToWatchlist(userId: string, symbol: string): Promise<Wa
 
 // Remove stock from watchlist
 export async function removeFromWatchlist(userId: string, symbol: string): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured')
   const { error } = await supabase
     .from('watchlists')
     .delete()
@@ -60,6 +63,7 @@ export async function removeFromWatchlist(userId: string, symbol: string): Promi
 
 // Check if stock is in watchlist
 export async function isInWatchlist(userId: string, symbol: string): Promise<boolean> {
+  if (!supabase) return false
   const { data, error } = await supabase
     .from('watchlists')
     .select('id')

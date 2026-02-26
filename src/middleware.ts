@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 const isPublicRoute = createRouteMatcher([
   '/',
@@ -10,8 +11,10 @@ const isPublicRoute = createRouteMatcher([
   '/portfolio/(.*)',
   '/watchlist',
   '/chat',
+  '/suggestions',
   '/auth/signin(.*)',
   '/auth/signup(.*)',
+  '/auth/error',
   '/api/webhook(.*)',
   '/api/stocks',
   '/api/stocks/(.*)',
@@ -19,19 +22,33 @@ const isPublicRoute = createRouteMatcher([
   '/api/portfolio',
   '/api/portfolio/init',
   '/api/portfolio/reset',
+  '/api/fear-greed',
+  '/api/chat',
 ])
 
 export default clerkMiddleware(async (auth, request) => {
   if (isPublicRoute(request)) return
 
-  // Avoid redirect loop: if the request is coming back from Clerk (e.g. after sign-in),
-  // let it through so the session cookie can be set and the page can load.
+  const url = request.nextUrl
+
+  // Avoid redirect loop: let through when coming back from Clerk (session may not be set yet on first request)
   const referer = request.headers.get('referer') ?? ''
   if (referer.includes('accounts.dev') || referer.includes('clerk.')) return
 
-  const authObj = await auth()
-  if (!authObj.userId) {
-    return authObj.redirectToSignIn({ returnBackUrl: request.url })
+  // Clerk callback or redirect params – let through so the flow can complete
+  if (url.searchParams.has('__clerk') || url.searchParams.has('__clerk_ticket')) return
+
+  // Never redirect to sign-in if we're already on an auth page (safety)
+  if (url.pathname.startsWith('/auth/')) return NextResponse.next()
+
+  try {
+    const authObj = await auth()
+    if (!authObj.userId) {
+      const returnBackUrl = url.pathname.startsWith('/auth/') ? '/' : request.url
+      return authObj.redirectToSignIn({ returnBackUrl })
+    }
+  } catch {
+    // If Clerk fails (e.g. missing env), allow request through so app routes still resolve
   }
 })
 

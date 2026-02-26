@@ -192,3 +192,13 @@ Consider starting with a small amount and learning as you go. Many people find i
     ],
   },
 ]
+
+export function getAllLessonIds(): string[] {
+  const ids: string[] = []
+  for (const course of courses) {
+    for (const mod of course.modules) {
+      for (const lesson of mod.lessons) ids.push(lesson.id)
+    }
+  }
+  return ids
+}

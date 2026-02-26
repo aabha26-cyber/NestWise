@@ -1,13 +1,91 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
+import { getSimulatorState } from '@/lib/simulatorStorage'
+import { getMultipleStocks } from '@/lib/stockApi'
+import { getOrCreatePortfolio, getHoldings } from '@/lib/portfolio'
 
 export default function Home() {
-  const { isSignedIn } = useUser()
+  const { isSignedIn, user } = useUser()
+  const [portfolioValue, setPortfolioValue] = useState<number | null>(null)
+  const [dailyChange, setDailyChange] = useState<number | null>(null)
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([])
+
+  useEffect(() => {
+    if (!isSignedIn || !user?.id) return
+    const userId = user.id
+    let cancelled = false
+    async function load() {
+      const localState = getSimulatorState(userId)
+      if (localState) {
+        let stocksValue = 0
+        if (localState.holdings.length > 0) {
+          const stocks = await getMultipleStocks(localState.holdings.map((h) => h.symbol))
+          const map = new Map(stocks.map((s) => [s.symbol, s]))
+          for (const h of localState.holdings) {
+            stocksValue += (map.get(h.symbol)?.price ?? 0) * h.shares
+          }
+        }
+        const total = localState.cashBalance + stocksValue
+        const history = localState.valueHistory || []
+        const prev = history.length >= 2 ? history[history.length - 2]?.totalValue : null
+        if (!cancelled) {
+          setPortfolioValue(total)
+          setDailyChange(prev != null ? total - prev : null)
+        }
+        return
+      }
+      try {
+        const portfolio = await getOrCreatePortfolio(userId)
+        const holdings = await getHoldings(portfolio.id)
+        let total = portfolio.cash_balance
+        if (holdings.length > 0) {
+          const stocks = await getMultipleStocks(holdings.map((h) => h.symbol))
+          const map = new Map(stocks.map((s) => [s.symbol, s]))
+          for (const h of holdings) {
+            total += (map.get(h.symbol)?.price ?? 0) * h.shares
+          }
+        }
+        if (!cancelled) setPortfolioValue(total)
+      } catch {
+        if (!cancelled) setPortfolioValue(null)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [isSignedIn, user?.id])
 
   return (
     <div className="min-h-screen">
+      {/* Signed-in: Wealth summary */}
+      {isSignedIn && portfolioValue != null && (
+        <section className="border-b border-dark-border bg-dark-card/50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-dark-text-secondary text-sm mb-1">Your portfolio</p>
+                <p className="text-2xl sm:text-3xl font-bold text-dark-text-primary">
+                  ${portfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                {dailyChange != null && (
+                  <p className={`text-sm mt-1 ${dailyChange >= 0 ? 'text-dark-accent-green' : 'text-red-500'}`}>
+                    {dailyChange >= 0 ? '+' : ''}${dailyChange.toFixed(2)} today
+                  </p>
+                )}
+              </div>
+              <Link href="/dashboard" className="btn-primary inline-flex items-center gap-2">
+                View dashboard
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
         <div className="text-center">
@@ -63,6 +141,84 @@ export default function Home() {
               Get Started
             </Link>
           )}
+        </div>
+      </section>
+
+      {/* Chat with AI on home */}
+      <section className="border-t border-dark-border bg-dark-card/30 py-12 sm:py-16">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-dark-text-primary mb-2 text-center">Ask the bot</h2>
+          <p className="text-dark-text-secondary text-center text-sm mb-6">
+            Ask where to invest, best investment ideas, or any question. The bot can suggest our top 3 investment options—then invest with one click after you confirm.
+          </p>
+          <div className="card">
+            {chatMessages.length > 0 && (
+              <div className="space-y-3 mb-4 max-h-48 overflow-y-auto">
+                {chatMessages.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`p-3 rounded-lg text-sm ${
+                      m.role === 'user'
+                        ? 'bg-dark-accent-green/20 text-dark-text-primary ml-4'
+                        : 'bg-dark-surface text-dark-text-secondary'
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                ))}
+              </div>
+            )}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault()
+                const q = chatInput.trim()
+                if (!q || chatLoading) return
+                setChatMessages((prev) => [...prev, { role: 'user', content: q }])
+                setChatInput('')
+                setChatLoading(true)
+                try {
+                  const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      messages: [...chatMessages, { role: 'user', content: q }].map((m) => ({
+                        role: m.role,
+                        content: m.content,
+                      })),
+                    }),
+                  })
+                  const data = await res.json()
+                  const reply = data.message || data.error || 'Sorry, I could not respond.'
+                  setChatMessages((prev) => [...prev, { role: 'assistant', content: reply }])
+                } catch {
+                  setChatMessages((prev) => [...prev, { role: 'assistant', content: 'Something went wrong. Try again or go to Ask AI.' }])
+                } finally {
+                  setChatLoading(false)
+                }
+              }}
+              className="flex gap-2"
+            >
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="e.g. Where should I invest? Best investment?"
+                className="flex-1 px-4 py-3 rounded-lg bg-dark-surface border border-dark-border text-dark-text-primary placeholder:text-dark-text-muted text-sm"
+                disabled={chatLoading}
+              />
+              <button type="submit" disabled={chatLoading} className="btn-primary px-4 py-3 text-sm whitespace-nowrap">
+                {chatLoading ? '…' : 'Ask'}
+              </button>
+            </form>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
+              <Link href="/suggestions" className="text-dark-accent-green hover:underline font-medium">
+                See top 3 investment options →
+              </Link>
+              <Link href="/chat" className="text-dark-text-muted hover:text-dark-text-secondary">
+                Full chat
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

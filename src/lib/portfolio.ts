@@ -4,6 +4,7 @@ export type { Holding, Transaction }
 
 // Get portfolio for a user without creating (returns null if none)
 export async function getPortfolio(userId: string): Promise<Portfolio | null> {
+  if (!supabase) return null
   const { data, error } = await supabase
     .from('portfolios')
     .select('*')
@@ -15,6 +16,7 @@ export async function getPortfolio(userId: string): Promise<Portfolio | null> {
 
 // Create a new portfolio with chosen starting cash (for simulator)
 export async function createPortfolio(userId: string, initialCash: number): Promise<Portfolio> {
+  if (!supabase) throw new Error('Supabase not configured')
   const { data, error } = await supabase
     .from('portfolios')
     .insert({
@@ -29,6 +31,7 @@ export async function createPortfolio(userId: string, initialCash: number): Prom
 
 // Reset simulator: set cash and clear all holdings and transactions
 export async function resetSimulator(portfolioId: string, newCash: number): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured')
   await supabase.from('holdings').delete().eq('portfolio_id', portfolioId)
   await supabase.from('transactions').delete().eq('portfolio_id', portfolioId)
   await updateCashBalance(portfolioId, Math.max(0, Number(newCash)))
@@ -43,6 +46,7 @@ export async function getOrCreatePortfolio(userId: string): Promise<Portfolio> {
 
 // Get all holdings for a portfolio
 export async function getHoldings(portfolioId: string): Promise<Holding[]> {
+  if (!supabase) return []
   const { data, error } = await supabase
     .from('holdings')
     .select('*')
@@ -63,6 +67,7 @@ export async function addHolding(
   shares: number,
   price: number
 ): Promise<Holding> {
+  if (!supabase) throw new Error('Supabase not configured')
   // Get existing holding
   const { data: existing } = await supabase
     .from('holdings')
@@ -119,6 +124,7 @@ export async function removeHolding(
   symbol: string,
   shares: number
 ): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured')
   const { data: existing } = await supabase
     .from('holdings')
     .select('*')
@@ -163,6 +169,7 @@ export async function recordTransaction(
   shares: number,
   price: number
 ): Promise<Transaction> {
+  if (!supabase) throw new Error('Supabase not configured')
   const totalAmount = shares * price
 
   const { data, error } = await supabase
@@ -190,6 +197,7 @@ export async function updateCashBalance(
   portfolioId: string,
   newBalance: number
 ): Promise<void> {
+  if (!supabase) throw new Error('Supabase not configured')
   const { error } = await supabase
     .from('portfolios')
     .update({ cash_balance: newBalance })
@@ -205,6 +213,7 @@ export async function getTransactions(
   portfolioId: string,
   limit: number = 50
 ): Promise<Transaction[]> {
+  if (!supabase) return []
   const { data, error } = await supabase
     .from('transactions')
     .select('*')
@@ -224,6 +233,7 @@ export async function recordPortfolioValue(
   portfolioId: string,
   totalValue: number
 ): Promise<void> {
+  if (!supabase) return
   await supabase.from('portfolio_history').insert({
     portfolio_id: portfolioId,
     total_value: totalValue,
@@ -235,6 +245,7 @@ export async function getPortfolioHistory(
   portfolioId: string,
   days: number = 30
 ): Promise<Array<{ total_value: number; recorded_at: string }>> {
+  if (!supabase) return []
   const since = new Date()
   since.setDate(since.getDate() - days)
 

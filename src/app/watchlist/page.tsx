@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { getWatchlist, addToWatchlist, removeFromWatchlist, type WatchlistItem } from '@/lib/watchlist'
 import { getMultipleStocks, type StockData } from '@/lib/stockApi'
+import { getWatchlistNote, setWatchlistNote } from '@/lib/watchlistNotes'
+import { unlockAchievement } from '@/lib/achievements'
 import Link from 'next/link'
 
 interface WatchlistItemWithStock extends WatchlistItem {
@@ -52,6 +54,8 @@ export default function WatchlistPage() {
     try {
       setProcessing(symbol)
       await addToWatchlist(user.id, symbol)
+      const items = await getWatchlist(user.id)
+      if (items.length >= 5) unlockAchievement(user.id, 'watchlist-5')
       await loadWatchlist()
     } catch (error) {
       console.error('Error adding to watchlist:', error)
@@ -148,12 +152,38 @@ export default function WatchlistPage() {
                 ) : (
                   <p className="text-dark-text-secondary text-sm mt-4">Loading price...</p>
                 )}
-                <Link
-                  href={`/explore?symbol=${item.symbol}`}
-                  className="mt-4 inline-block text-sm text-dark-accent-green hover:underline"
-                >
-                  View Details →
-                </Link>
+                {user && (
+                  <div className="mt-3">
+                    <label className="block text-xs text-dark-text-muted mb-1">Why I&apos;m watching</label>
+                    <input
+                      type="text"
+                      placeholder="Optional note..."
+                      defaultValue={getWatchlistNote(user.id, item.symbol)}
+                      onBlur={(e) => setWatchlistNote(user.id, item.symbol, e.target.value)}
+                      className="w-full px-3 py-1.5 rounded-lg bg-dark-card border border-dark-border text-dark-text-primary text-sm placeholder:text-dark-text-muted"
+                    />
+                  </div>
+                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href={`/explore?symbol=${item.symbol}`}
+                    className="text-sm text-dark-accent-green hover:underline"
+                  >
+                    View
+                  </Link>
+                  <Link
+                    href={`/portfolio?buy=${item.symbol}`}
+                    className="text-sm px-2 py-1 rounded bg-dark-accent-green/20 text-dark-accent-green hover:bg-dark-accent-green/30 transition-colors"
+                  >
+                    Buy
+                  </Link>
+                  <Link
+                    href={`/portfolio?symbol=${item.symbol}`}
+                    className="text-sm px-2 py-1 rounded bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+                  >
+                    Sell
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

@@ -1,8 +1,37 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import AuthButton from './AuthButton'
+
+function ThemeToggle() {
+  const [light, setLight] = useState(false)
+  useEffect(() => {
+    setLight(document.documentElement.classList.contains('light'))
+  }, [])
+  const toggle = () => {
+    const next = !document.documentElement.classList.contains('light')
+    if (next) {
+      document.documentElement.classList.add('light')
+      localStorage.setItem('nestwise_theme', 'light')
+    } else {
+      document.documentElement.classList.remove('light')
+      localStorage.setItem('nestwise_theme', 'dark')
+    }
+    setLight(next)
+  }
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      className="p-2 rounded-lg border border-dark-border bg-dark-surface hover:bg-dark-card text-dark-text-secondary hover:text-dark-text-primary transition-colors"
+      title={light ? 'Switch to dark mode' : 'Switch to light mode'}
+    >
+      {light ? '🌙' : '☀️'}
+    </button>
+  )
+}
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -12,6 +41,7 @@ export default function Navigation() {
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/explore', label: 'Explore' },
     { href: '/portfolio', label: 'Portfolio' },
+    { href: '/suggestions', label: 'Suggestions' },
     { href: '/watchlist', label: 'Watchlist' },
     { href: '/chat', label: 'Ask AI' },
     { href: '/learn', label: 'Learn' },
@@ -31,6 +61,7 @@ export default function Navigation() {
           </Link>
           
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <div className="hidden md:flex items-center space-x-1">
               {navItems.map((item) => (
                 <Link

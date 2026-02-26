@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { addHolding, removeHolding, updateCashBalance, recordTransaction, type Holding } from '@/lib/portfolio'
 import { getStockData, getMultipleStocks, searchStocks, type StockData } from '@/lib/stockApi'
@@ -11,8 +11,16 @@ import {
   removeSimulatorHolding,
   updateSimulatorCash,
   resetSimulatorLocal,
+  appendValueSnapshot,
+  recordSimulatorTransaction,
+  exportSimulatorDataCSV,
+  applyRecurringDepositIfDue,
+  getRecurringDeposit,
+  setRecurringDeposit,
 } from '@/lib/simulatorStorage'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { getSectorBreakdown, getPortfolioRiskScore, getSector } from '@/lib/sectors'
 
 interface HoldingWithStock extends Holding {
   stock?: StockData
@@ -20,8 +28,9 @@ interface HoldingWithStock extends Holding {
 
 const PRESET_CASH = [10000, 25000, 100000]
 
-export default function Portfolio() {
+function PortfolioPageContent() {
   const { user, isLoaded: userLoaded } = useUser()
+  const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [portfolio, setPortfolio] = useState<any>(null)
@@ -40,11 +49,31 @@ export default function Portfolio() {
   const [selectedStockForTrade, setSelectedStockForTrade] = useState<StockData | null>(null)
   const [buySharesInput, setBuySharesInput] = useState('')
   const [buyDollarInput, setBuyDollarInput] = useState('')
+  const [recurringDepositConfig, setRecurringDepositConfig] = useState<{ amount: number; interval: 'week' | 'month'; lastApplied: string } | null>(null)
+  const [recurringAmount, setRecurringAmount] = useState('')
+  const [recurringInterval, setRecurringInterval] = useState<'week' | 'month'>('month')
+  const [fearGreed, setFearGreed] = useState<{ value: number; label: string } | null>(null)
+
+  useEffect(() => {
+    fetch('/api/fear-greed')
+      .then((r) => r.json())
+      .then((d) => setFearGreed({ value: d.value ?? 50, label: d.label ?? 'Neutral' }))
+      .catch(() => setFearGreed({ value: 50, label: 'Neutral' }))
+  }, [])
 
   useEffect(() => {
     if (!userLoaded || !user) return
     loadPortfolio()
   }, [userLoaded, user])
+
+  // Open buy modal when arriving with ?symbol= or ?buy=
+  useEffect(() => {
+    const sym = searchParams.get('symbol') || searchParams.get('buy')
+    if (!sym || loading || !portfolio || selectedStockForTrade) return
+    getStockData(sym.trim().toUpperCase()).then((stock) => {
+      if (stock) setSelectedStockForTrade(stock)
+    })
+  }, [searchParams, loading, portfolio, selectedStockForTrade])
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -68,6 +97,7 @@ export default function Portfolio() {
         setError('Please sign in to view your portfolio')
         return
       }
+      applyRecurringDepositIfDue(user.id)
       const localState = getSimulatorState(user.id)
       if (localState) {
         setPortfolio({ id: 'local' })
@@ -90,6 +120,11 @@ export default function Portfolio() {
           stock: stockDataMap.get(h.symbol),
         }))
         setHoldings(holdingsWithStocks)
+        const totalValue =
+          localState.cashBalance +
+          holdingsWithStocks.reduce((sum, h) => sum + (h.stock?.price ?? 0) * h.shares, 0)
+        appendValueSnapshot(user.id, totalValue)
+        setRecurringDepositConfig(getRecurringDeposit(user.id))
         setLoading(false)
         return
       }
@@ -218,6 +253,7 @@ export default function Portfolio() {
       if (portfolio.id === 'local') {
         addSimulatorHolding(user.id, symbol, numShares, stock.price)
         updateSimulatorCash(user.id, cashBalance - cost)
+        recordSimulatorTransaction(user.id, 'buy', symbol, numShares, stock.price)
         setCashBalance(cashBalance - cost)
         setSelectedStockForTrade(null)
         setBuySharesInput('')
@@ -250,8 +286,12 @@ export default function Portfolio() {
       if (!stock) throw new Error(`Could not fetch price for ${symbol}`)
       const proceeds = stock.price * shares
       if (portfolio.id === 'local') {
+        const localState = getSimulatorState(user.id)
+        const holding = localState?.holdings.find((h) => h.symbol === symbol)
+        const averageCost = holding?.average_cost
         removeSimulatorHolding(user.id, symbol, shares)
         updateSimulatorCash(user.id, cashBalance + proceeds)
+        recordSimulatorTransaction(user.id, 'sell', symbol, shares, stock.price, averageCost)
         setCashBalance(cashBalance + proceeds)
         await loadPortfolio()
       } else {
@@ -365,6 +405,15 @@ export default function Portfolio() {
   }, 0)
 
   const totalPortfolioValue = cashBalance + totalValue
+  const holdingValues = holdings.map((h) => ({
+    symbol: h.symbol,
+    value: (h.stock?.price ?? 0) * h.shares,
+  }))
+  const sectorBreakdown = getSectorBreakdown(holdingValues)
+  const riskIndicator = getPortfolioRiskScore(
+    holdingValues.map((h) => ({ value: h.value })),
+    totalValue || 1
+  )
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -377,6 +426,25 @@ export default function Portfolio() {
           <Link href="/portfolio/analytics" className="btn-secondary text-sm">
             Analytics
           </Link>
+          {portfolio?.id === 'local' && (
+            <button
+              type="button"
+              onClick={() => {
+                if (!user?.id) return
+                const csv = exportSimulatorDataCSV(user.id)
+                const blob = new Blob([csv], { type: 'text/csv' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `nestwise-portfolio-${new Date().toISOString().slice(0, 10)}.csv`
+                a.click()
+                URL.revokeObjectURL(url)
+              }}
+              className="btn-secondary text-sm"
+            >
+              Export CSV
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setResetModalOpen(true)}
@@ -464,9 +532,136 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* Holdings */}
+      {portfolio?.id === 'local' && user && (
+        <div className="card mb-8">
+          <h3 className="text-lg font-semibold text-dark-text-primary mb-3">Recurring deposit</h3>
+          {recurringDepositConfig ? (
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <p className="text-dark-text-secondary text-sm">
+                Adding ${recurringDepositConfig.amount.toLocaleString()} per {recurringDepositConfig.interval}.
+                Next deposit applied automatically when you visit.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setRecurringDeposit(user.id, 0, 'month')
+                  setRecurringDepositConfig(null)
+                }}
+                className="text-sm text-red-400 hover:text-red-300"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-dark-text-secondary text-sm">Add</span>
+              <input
+                type="number"
+                min="1"
+                step="100"
+                placeholder="500"
+                value={recurringAmount}
+                className="w-24 px-3 py-2 rounded-lg bg-dark-surface border border-dark-border text-dark-text-primary text-sm"
+                onChange={(e) => setRecurringAmount(e.target.value)}
+              />
+              <span className="text-dark-text-secondary text-sm">$ per</span>
+              <select
+                value={recurringInterval}
+                onChange={(e) => setRecurringInterval(e.target.value as 'week' | 'month')}
+                className="px-3 py-2 rounded-lg bg-dark-surface border border-dark-border text-dark-text-primary text-sm"
+              >
+                <option value="week">week</option>
+                <option value="month">month</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => {
+                  const amt = parseInt(recurringAmount, 10)
+                  if (!Number.isFinite(amt) || amt <= 0) return
+                  setRecurringDeposit(user.id, amt, recurringInterval)
+                  setRecurringDepositConfig(getRecurringDeposit(user.id))
+                }}
+                className="btn-primary text-sm py-2"
+              >
+                Enable
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Risk · Sector · Fear & Greed */}
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <div className="card">
+          <h3 className="text-lg font-semibold text-dark-text-primary mb-3">Risk indicators</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-dark-text-secondary">Portfolio risk</span>
+              <span
+                className={
+                  riskIndicator.label === 'High' ? 'text-red-400 font-medium' : riskIndicator.label === 'Medium' ? 'text-yellow-400 font-medium' : 'text-dark-accent-green font-medium'
+                }
+              >
+                {riskIndicator.label}
+              </span>
+            </div>
+            <div className="h-2 rounded-full bg-dark-surface overflow-hidden">
+              <div
+                className="h-full transition-all"
+                style={{
+                  width: `${(riskIndicator.score / 10) * 100}%`,
+                  backgroundColor:
+                    riskIndicator.label === 'High' ? 'rgb(248 113 113)' : riskIndicator.label === 'Medium' ? 'rgb(250 204 21)' : 'rgb(16 185 129)',
+                }}
+              />
+            </div>
+            <p className="text-xs text-dark-text-muted">Top holding: {riskIndicator.concentrationPercent.toFixed(0)}% of invested</p>
+          </div>
+        </div>
+        <div className="card">
+          <h3 className="text-lg font-semibold text-dark-text-primary mb-3">Sector analysis</h3>
+          {sectorBreakdown.length === 0 ? (
+            <p className="text-dark-text-secondary text-sm">No holdings yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {sectorBreakdown.map((s) => (
+                <li key={s.sector} className="flex justify-between text-sm">
+                  <span className="text-dark-text-primary">{s.sector}</span>
+                  <span className="text-dark-text-secondary">{s.percent.toFixed(1)}%</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="card">
+          <h3 className="text-lg font-semibold text-dark-text-primary mb-3">Market sentiment</h3>
+          {fearGreed ? (
+            <>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl font-bold text-dark-text-primary">{fearGreed.value}</span>
+                <span className="text-dark-text-secondary text-sm">Fear & Greed</span>
+              </div>
+              <div className="h-2 rounded-full bg-dark-surface overflow-hidden">
+                <div
+                  className="h-full transition-all"
+                  style={{
+                    width: `${fearGreed.value}%`,
+                    backgroundColor:
+                      fearGreed.value <= 25 ? 'rgb(239 68 68)' : fearGreed.value <= 45 ? 'rgb(251 146 60)' : fearGreed.value <= 55 ? 'rgb(250 204 21)' : fearGreed.value <= 75 ? 'rgb(34 197 94)' : 'rgb(16 185 129)',
+                  }}
+                />
+              </div>
+              <p className="text-xs text-dark-text-muted mt-1">{fearGreed.label}</p>
+            </>
+          ) : (
+            <p className="text-dark-text-secondary text-sm">Loading…</p>
+          )}
+        </div>
+      </div>
+
+      {/* Individual holdings */}
       <div className="card mb-8">
-        <h2 className="text-xl font-semibold text-dark-text-primary mb-6">Your Holdings</h2>
+        <h2 className="text-xl font-semibold text-dark-text-primary mb-6">Individual holdings</h2>
         {holdings.length === 0 ? (
           <p className="text-dark-text-secondary text-center py-8">
             No holdings yet. Add stocks to start building your simulated portfolio.
@@ -489,7 +684,10 @@ export default function Portfolio() {
                     <h3 className="text-lg font-semibold text-dark-text-primary">
                       {holding.stock?.name || holding.symbol}
                     </h3>
-                    <p className="text-dark-text-secondary">{holding.symbol}</p>
+                    <p className="text-dark-text-secondary">
+                      {holding.symbol}
+                      <span className="ml-2 text-xs text-dark-text-muted">· {getSector(holding.symbol)}</span>
+                    </p>
                     {holding.stock && (
                       <p className={`text-sm mt-1 ${holding.stock.change >= 0 ? 'text-dark-accent-green' : 'text-red-500'}`}>
                         {holding.stock.change >= 0 ? '+' : ''}
@@ -640,5 +838,24 @@ export default function Portfolio() {
         </p>
       </div>
     </div>
+  )
+}
+
+function PortfolioLoading() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="card text-center py-12">
+        <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-dark-text-secondary">Loading...</p>
+      </div>
+    </div>
+  )
+}
+
+export default function Portfolio() {
+  return (
+    <Suspense fallback={<PortfolioLoading />}>
+      <PortfolioPageContent />
+    </Suspense>
   )
 }
