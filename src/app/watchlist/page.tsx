@@ -102,7 +102,13 @@ export default function WatchlistPage() {
     )
   }
 
-  const popularStocks = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'META', 'NVDA', 'NFLX']
+  // Broader list so users can see and add many stocks (stocks + ETFs)
+  const browseStocks = [
+    'AAPL', 'GOOGL', 'MSFT', 'TSLA', 'AMZN', 'META', 'NVDA', 'NFLX', 'DIS', 'JPM',
+    'V', 'MA', 'WMT', 'JNJ', 'PG', 'BAC', 'XOM', 'UNH', 'HD', 'KO',
+    'PYPL', 'ADBE', 'NKE', 'CRM', 'INTC', 'AMD', 'AVGO', 'ORCL', 'CSCO', 'PEP',
+    'COST', 'MCD', 'SPY', 'QQQ', 'VTI', 'VOO', 'IWM', 'BND',
+  ]
   const watchlistSymbols = new Set(watchlist.map(item => item.symbol))
 
   return (
@@ -190,29 +196,27 @@ export default function WatchlistPage() {
         )}
       </div>
 
-      {/* Add Stocks */}
+      {/* Browse all stocks — click to add/remove from watchlist */}
       <div className="card">
-        <h2 className="text-xl font-semibold text-dark-text-primary mb-4">Add Stocks to Watchlist</h2>
-        <div className="grid md:grid-cols-4 gap-4">
-          {popularStocks.map((symbol) => {
+        <h2 className="text-xl font-semibold text-dark-text-primary mb-4">All stocks — click to add to watchlist</h2>
+        <p className="text-dark-text-secondary text-sm mb-4">Click a symbol to add it to your watchlist. Click again (when it shows ✓) to remove.</p>
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
+          {browseStocks.map((symbol) => {
             const isWatched = watchlistSymbols.has(symbol)
             return (
               <button
                 key={symbol}
+                type="button"
                 onClick={() => isWatched ? handleRemove(symbol) : handleAdd(symbol)}
                 disabled={processing === symbol}
-                className={`p-4 rounded-lg border text-left transition-all duration-200 ${
+                className={`p-3 rounded-lg border text-center transition-all duration-200 whitespace-nowrap ${
                   isWatched
-                    ? 'bg-dark-accent-green/20 border-dark-accent-green/50'
-                    : 'bg-dark-surface hover:bg-dark-card border-dark-border hover:border-dark-accent-green/50'
+                    ? 'bg-dark-accent-green/20 border-dark-accent-green/50 text-dark-accent-green font-medium'
+                    : 'bg-dark-surface hover:bg-dark-card border-dark-border hover:border-dark-accent-green/50 text-dark-text-primary'
                 } disabled:opacity-50`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-dark-text-primary">{symbol}</span>
-                  <span className={isWatched ? 'text-dark-accent-green' : 'text-dark-text-secondary'}>
-                    {isWatched ? '✓' : '+'}
-                  </span>
-                </div>
+                <span className="font-semibold">{symbol}</span>
+                <span className="ml-1 text-sm">{isWatched ? '✓' : '+'}</span>
               </button>
             )
           })}
