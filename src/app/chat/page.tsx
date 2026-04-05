@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { NestWiseIcon } from '@/components/NestWiseIcon'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -11,7 +12,8 @@ export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hey! 👋 So glad you're here. I'm your investing buddy—think of me like a friend who's into this stuff and loves explaining it in plain English. I can help you understand stocks, ETFs, risk, diversification, or whatever's on your mind. No judgment, no boring jargon. (Just so you know: I'm for learning only, not financial advice.) What do you want to dive into?",
+      content:
+        "Hey! So glad you're here. I'm your investing buddy—think of me like a friend who's into this stuff and loves explaining it in plain English. I can help you understand stocks, ETFs, risk, diversification, or whatever's on your mind. No judgment, no boring jargon. (Just so you know: I'm for learning only, not financial advice.) What do you want to dive into?",
     },
   ])
   const [input, setInput] = useState('')
@@ -79,10 +81,11 @@ export default function Chat() {
       </div>
 
       {/* Disclaimer Banner */}
-      <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
+      <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6 flex gap-3">
+        <NestWiseIcon name="alert-triangle" size={22} className="text-yellow-400 shrink-0 mt-0.5" />
         <p className="text-sm text-yellow-400">
-          <strong>⚠️ Not financial advice. Educational use only.</strong> This AI provides general 
-          educational information to help you learn about investing. Always consult with a qualified 
+          <strong>Not financial advice. Educational use only.</strong> This AI provides general
+          educational information to help you learn about investing. Always consult with a qualified
           financial advisor before making investment decisions.
         </p>
       </div>

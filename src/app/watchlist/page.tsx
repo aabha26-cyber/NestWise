@@ -7,6 +7,7 @@ import { getMultipleStocks, type StockData } from '@/lib/stockApi'
 import { getWatchlistNote, setWatchlistNote } from '@/lib/watchlistNotes'
 import { unlockAchievement } from '@/lib/achievements'
 import Link from 'next/link'
+import { NestWiseIcon } from '@/components/NestWiseIcon'
 
 interface WatchlistItemWithStock extends WatchlistItem {
   stock?: StockData
@@ -137,11 +138,13 @@ export default function WatchlistPage() {
                     <p className="text-dark-text-secondary">{item.symbol}</p>
                   </div>
                   <button
+                    type="button"
                     onClick={() => handleRemove(item.symbol)}
                     disabled={processing === item.symbol}
-                    className="text-red-400 hover:text-red-300 disabled:opacity-50"
+                    className="p-1.5 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/10 disabled:opacity-50"
+                    aria-label={`Remove ${item.symbol} from watchlist`}
                   >
-                    ✕
+                    <NestWiseIcon name="x" size={18} className="text-red-400" />
                   </button>
                 </div>
                 {item.stock ? (
@@ -199,7 +202,9 @@ export default function WatchlistPage() {
       {/* Browse all stocks — click to add/remove from watchlist */}
       <div className="card">
         <h2 className="text-xl font-semibold text-dark-text-primary mb-4">All stocks — click to add to watchlist</h2>
-        <p className="text-dark-text-secondary text-sm mb-4">Click a symbol to add it to your watchlist. Click again (when it shows ✓) to remove.</p>
+        <p className="text-dark-text-secondary text-sm mb-4">
+          Tap a symbol to add it. Tap again when it shows the checkmark to remove.
+        </p>
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-3">
           {browseStocks.map((symbol) => {
             const isWatched = watchlistSymbols.has(symbol)
@@ -216,7 +221,13 @@ export default function WatchlistPage() {
                 } disabled:opacity-50`}
               >
                 <span className="font-semibold">{symbol}</span>
-                <span className="ml-1 text-sm">{isWatched ? '✓' : '+'}</span>
+                <span className="ml-1 inline-flex align-middle">
+                  {isWatched ? (
+                    <NestWiseIcon name="check" size={14} className="text-dark-accent-green" />
+                  ) : (
+                    <NestWiseIcon name="plus" size={14} />
+                  )}
+                </span>
               </button>
             )
           })}

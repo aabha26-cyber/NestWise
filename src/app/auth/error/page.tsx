@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { AlertTriangle } from 'lucide-react'
 
 export default function AuthError({
   searchParams,
@@ -19,7 +20,11 @@ export default function AuthError({
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="card text-center">
-          <div className="text-5xl mb-4">⚠️</div>
+          <div className="flex justify-center mb-6">
+            <span className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/30">
+              <AlertTriangle className="w-9 h-9" strokeWidth={1.65} aria-hidden />
+            </span>
+          </div>
           <h1 className="text-2xl font-bold text-dark-text-primary mb-4">
             Authentication Error
           </h1>

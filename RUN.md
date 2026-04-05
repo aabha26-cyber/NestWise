@@ -11,7 +11,7 @@
    ```bash
    npm run clean-dev
    ```
-4. Open **http://localhost:8080**
+4. Open **http://localhost:3000**
 
 If you skip Clerk setup, you may see an error screen; follow the link there to add keys and restart.
 
@@ -23,9 +23,9 @@ If you skip Clerk setup, you may see an error screen; follow the link there to a
 ## If you see "missing required error components", "invalid response", "Cannot find module", or "Server Error"
 
 1. **Stop the dev server** (Ctrl+C in the terminal where it’s running).
-2. **Free port 8080** (if you see `EADDRINUSE`):
+2. **Free port 3000** (if you see `EADDRINUSE`):
    ```bash
-   lsof -i :8080 | grep LISTEN   # note the PID
+   lsof -i :3000 | grep LISTEN   # note the PID
    kill <PID>
    ```
 3. **Clean build and start dev:**
@@ -33,7 +33,7 @@ If you skip Clerk setup, you may see an error screen; follow the link there to a
    npm run clean-dev
    ```
    Or: `npm run fix` then `npm run dev`.
-4. Open **http://localhost:8080**
+4. Open **http://localhost:3000**
 
 ## If you see "EMFILE: too many open files"
 
@@ -50,4 +50,4 @@ npm run dev
 npm run dev
 ```
 
-Then open **http://localhost:8080**.
+Then open **http://localhost:3000** (always include the port — `http://localhost` alone will not work).

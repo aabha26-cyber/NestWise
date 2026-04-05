@@ -3,32 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
-import { courses, getAllLessonIds, type Course, type Lesson, type Resource } from '@/lib/courses'
+import { courses, getAllLessonIds, type Course, type Lesson } from '@/lib/courses'
 import { getProgressStats, markLessonComplete, getCompletedLessonIds } from '@/lib/learnProgress'
-
-function ResourceLink({ resource }: { resource: Resource }) {
-  const isVideo = resource.type === 'video'
-  return (
-    <a
-      href={resource.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-start gap-3 p-3 rounded-lg bg-dark-surface hover:bg-dark-card border border-dark-border hover:border-dark-accent-green/50 transition-all group"
-    >
-      <span className="text-xl shrink-0">{isVideo ? '▶️' : '📄'}</span>
-      <div className="min-w-0">
-        <p className="font-medium text-dark-text-primary group-hover:text-dark-accent-green transition-colors">
-          {resource.title}
-        </p>
-        <p className="text-sm text-dark-text-secondary">{resource.source}</p>
-        {resource.description && (
-          <p className="text-xs text-dark-text-muted mt-1">{resource.description}</p>
-        )}
-      </div>
-      <span className="text-dark-text-muted text-sm shrink-0">↗</span>
-    </a>
-  )
-}
+import { NestWiseIcon } from '@/components/NestWiseIcon'
 
 function LessonCard({
   lesson,
@@ -44,25 +21,25 @@ function LessonCard({
   userId?: string
 }) {
   const [open, setOpen] = useState(defaultOpen)
-  const hasResources = (lesson.articles?.length ?? 0) + (lesson.videos?.length ?? 0) > 0
   return (
     <div className="border border-dark-border rounded-xl overflow-hidden bg-dark-card">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-4 p-4 text-left hover:bg-dark-surface/50 transition-colors"
       >
-        <span className="text-2xl">{lesson.icon}</span>
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-dark-accent-green/10 text-dark-accent-green ring-1 ring-dark-accent-green/20">
+          <NestWiseIcon name={lesson.icon} size={20} />
+        </span>
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-dark-text-primary">{lesson.title}</h3>
-          {hasResources && (
-            <p className="text-sm text-dark-text-secondary mt-0.5">
-              {lesson.articles?.length ?? 0} article{(lesson.articles?.length ?? 0) !== 1 ? 's' : ''},{' '}
-              {lesson.videos?.length ?? 0} video{(lesson.videos?.length ?? 0) !== 1 ? 's' : ''}
-            </p>
-          )}
+          <p className="text-sm text-dark-text-secondary mt-0.5">NestWise lesson · read & mark complete</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          {completed && <span className="text-dark-accent-green text-lg" title="Completed">✓</span>}
+          {completed && (
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-dark-accent-green/20 text-dark-accent-green" title="Completed">
+              <NestWiseIcon name="check" size={16} />
+            </span>
+          )}
           {userId && !completed && onMarkComplete && (
             <button
               type="button"
@@ -72,7 +49,7 @@ function LessonCard({
               Mark complete
             </button>
           )}
-          <span className="text-dark-text-muted">{open ? '▼' : '▶'}</span>
+          <NestWiseIcon name={open ? 'chevron-down' : 'chevron-right'} className="text-dark-text-muted" size={20} />
         </div>
       </button>
       {open && (
@@ -80,21 +57,6 @@ function LessonCard({
           <p className="text-dark-text-secondary leading-relaxed whitespace-pre-line pt-4">
             {lesson.content}
           </p>
-          {hasResources && (
-            <div className="mt-6 space-y-4">
-              <h4 className="text-sm font-semibold text-dark-text-primary uppercase tracking-wide">
-                Worth reading & watching
-              </h4>
-              <div className="grid gap-2">
-                {lesson.articles?.map((a) => (
-                  <ResourceLink key={a.url} resource={a} />
-                ))}
-                {lesson.videos?.map((v) => (
-                  <ResourceLink key={v.url} resource={v} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -119,12 +81,18 @@ function CourseSection({
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-start gap-4 text-left"
       >
-        <span className="text-4xl">{course.icon}</span>
+        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-dark-accent-green/10 text-dark-accent-green ring-1 ring-dark-accent-green/25">
+          <NestWiseIcon name={course.icon} size={28} />
+        </span>
         <div className="flex-1 min-w-0">
           <h2 className="text-xl font-bold text-dark-text-primary">{course.title}</h2>
           <p className="text-dark-text-secondary mt-1">{course.description}</p>
         </div>
-        <span className="text-dark-text-muted shrink-0">{expanded ? '▼' : '▶'}</span>
+        <NestWiseIcon
+          name={expanded ? 'chevron-down' : 'chevron-right'}
+          className="text-dark-text-muted shrink-0 mt-1"
+          size={22}
+        />
       </button>
       {expanded && (
         <div className="mt-6 space-y-6">
@@ -172,9 +140,9 @@ export default function Learn() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-12 text-center">
-        <h1 className="text-4xl font-bold text-dark-text-primary mb-4">Learn Investing</h1>
+        <h1 className="text-4xl font-bold text-dark-text-primary mb-4">Learn</h1>
         <p className="text-xl text-dark-text-secondary max-w-2xl mx-auto">
-          Structured courses with articles and videos for beginners. Take your time and explore.
+          NestWise curriculum — budgeting, credit, taxes, insurance, investing, and more. Written for clarity, not hype.
         </p>
         {user && totalLessons > 0 && (
           <div className="mt-6 max-w-md mx-auto">
@@ -192,6 +160,38 @@ export default function Learn() {
         )}
       </div>
 
+      <div className="card mb-10 p-0 overflow-hidden border-dark-border">
+        <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-dark-border">
+          <Link
+            href="/learn/quiz"
+            className="flex items-center gap-3 p-4 sm:p-5 hover:bg-dark-card/40 transition-colors group"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-dark-accent-green/10 text-dark-accent-green ring-1 ring-dark-accent-green/20" aria-hidden>
+              <NestWiseIcon name="list-checks" size={22} />
+            </span>
+            <div className="min-w-0 text-left">
+              <p className="font-semibold text-dark-text-primary group-hover:text-dark-accent-green transition-colors">
+                Daily quiz
+              </p>
+              <p className="text-xs sm:text-sm text-dark-text-secondary">5 questions · streaks · teach-back</p>
+            </div>
+            <NestWiseIcon name="arrow-right" className="ml-auto text-dark-text-muted group-hover:text-dark-accent-green shrink-0" size={18} />
+          </Link>
+          <Link href="/goals" className="flex items-center gap-3 p-4 sm:p-5 hover:bg-dark-card/40 transition-colors group">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-dark-accent-green/10 text-dark-accent-green ring-1 ring-dark-accent-green/20" aria-hidden>
+              <NestWiseIcon name="target" size={22} />
+            </span>
+            <div className="min-w-0 text-left">
+              <p className="font-semibold text-dark-text-primary group-hover:text-dark-accent-green transition-colors">
+                Savings goal
+              </p>
+              <p className="text-xs sm:text-sm text-dark-text-secondary">Pretend goal vs simulator gains</p>
+            </div>
+            <NestWiseIcon name="arrow-right" className="ml-auto text-dark-text-muted group-hover:text-dark-accent-green shrink-0" size={18} />
+          </Link>
+        </div>
+      </div>
+
       <div className="space-y-4">
         {courses.map((course) => (
           <CourseSection
@@ -206,16 +206,15 @@ export default function Learn() {
 
       <div className="mt-12 text-center">
         <Link href="/chat" className="btn-primary inline-block">
-          Have Questions? Ask AI
+          Have questions? Ask AI
         </Link>
       </div>
 
       <div className="mt-12 p-6 bg-dark-surface/50 border border-dark-border rounded-lg">
         <p className="text-sm text-dark-text-muted text-center">
-          <strong className="text-dark-text-secondary">Remember:</strong> This content is for
-          educational purposes only and does not constitute financial advice. External links go to
-          Investopedia, SEC, Khan Academy, and other trusted sources. Always consult a qualified
-          financial advisor before making investment decisions.
+          <strong className="text-dark-text-secondary">Remember:</strong> Lessons and tools are for education only
+          and do not constitute tax, legal, or financial advice. Always consult a qualified professional for decisions
+          about your situation.
         </p>
       </div>
     </div>

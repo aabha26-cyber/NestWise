@@ -1,12 +1,30 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { searchStocks, getStockData, type StockData } from '@/lib/stockApi'
 import { useUser } from '@clerk/nextjs'
 import { addToWatchlist, isInWatchlist } from '@/lib/watchlist'
+import StockDeepDive from '@/components/StockDeepDive'
+import { NestWiseIcon } from '@/components/NestWiseIcon'
 
-export default function Explore() {
+function ExploreLoading() {
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="card text-center py-12">
+        <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-dark-text-secondary">Loading explorer…</p>
+      </div>
+    </div>
+  )
+}
+
+function ExploreContent() {
   const { user } = useUser()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const symbolFromUrl = searchParams.get('symbol')?.trim() ?? ''
+
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null)
   const [stocks, setStocks] = useState<StockData[]>([])
@@ -26,12 +44,52 @@ export default function Explore() {
     }
   }, [user, stocks])
 
+  /** Open a stock from ?symbol= in the URL (e.g. watchlist links). */
+  useEffect(() => {
+    if (!symbolFromUrl) return
+    let cancelled = false
+    const sym = symbolFromUrl.toUpperCase()
+    ;(async () => {
+      let stock = await getStockData(sym)
+      if (cancelled || !stock) return
+      if (!stock.description) {
+        const full = await getStockData(stock.symbol)
+        if (full) stock = full
+      }
+      if (cancelled || !stock) return
+      setSearchQuery(symbolFromUrl)
+      setAiOverview(null)
+      setSelectedStock(stock)
+      setAiOverviewLoading(true)
+      try {
+        const res = await fetch('/api/stock-overview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            symbol: stock.symbol,
+            name: stock.name,
+            description: stock.description ?? undefined,
+          }),
+        })
+        const data = await res.json()
+        if (!cancelled && data.overview) setAiOverview(data.overview)
+      } catch (e) {
+        console.error('AI overview error:', e)
+      } finally {
+        if (!cancelled) setAiOverviewLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [symbolFromUrl])
+
   const loadStocks = async () => {
     try {
       setLoading(true)
       const results = await searchStocks(searchQuery)
       setStocks(results)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading stocks:', error)
     } finally {
       setLoading(false)
@@ -47,20 +105,6 @@ export default function Explore() {
       statusMap.set(stock.symbol, isWatched)
     }
     setWatchlistStatus(statusMap)
-  }
-
-  const handleStockClick = async (stock: StockData) => {
-    setAiOverview(null)
-    if (!stock.description) {
-      const fullStock = await getStockData(stock.symbol)
-      if (fullStock) {
-        setSelectedStock(fullStock)
-        fetchAiOverview(fullStock)
-        return
-      }
-    }
-    setSelectedStock(stock)
-    fetchAiOverview(stock)
   }
 
   const fetchAiOverview = async (stock: StockData) => {
@@ -84,6 +128,26 @@ export default function Explore() {
     }
   }
 
+  const handleStockClick = async (stock: StockData) => {
+    setAiOverview(null)
+    if (!stock.description) {
+      const fullStock = await getStockData(stock.symbol)
+      if (fullStock) {
+        setSelectedStock(fullStock)
+        fetchAiOverview(fullStock)
+        return
+      }
+    }
+    setSelectedStock(stock)
+    fetchAiOverview(stock)
+  }
+
+  const backToSearch = () => {
+    setSelectedStock(null)
+    setAiOverview(null)
+    router.replace('/explore')
+  }
+
   const handleToggleWatchlist = async (symbol: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (!user) return
@@ -91,8 +155,6 @@ export default function Explore() {
     try {
       const currentlyWatched = watchlistStatus.get(symbol)
       if (currentlyWatched) {
-        // Remove logic would go here if we had remove function in this context
-        // For now, just update the UI optimistically
         setWatchlistStatus(new Map(watchlistStatus.set(symbol, false)))
       } else {
         await addToWatchlist(user.id, symbol)
@@ -121,7 +183,7 @@ export default function Explore() {
         />
       </div>
 
-      {loading && (
+      {loading && !selectedStock && (
         <div className="text-center py-12">
           <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-dark-text-secondary">Loading stocks...</p>
@@ -132,7 +194,8 @@ export default function Explore() {
         /* Stock Detail View */
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => { setSelectedStock(null); setAiOverview(null) }}
+            type="button"
+            onClick={backToSearch}
             className="mb-6 text-dark-text-secondary hover:text-dark-text-primary transition-colors"
           >
             ← Back to search
@@ -165,14 +228,25 @@ export default function Explore() {
             {user && (
               <div className="mb-6">
                 <button
-                  onClick={() => handleToggleWatchlist(selectedStock.symbol, {} as any)}
+                  type="button"
+                  onClick={() => handleToggleWatchlist(selectedStock.symbol, {} as React.MouseEvent)}
                   className={`btn-secondary text-sm ${
                     watchlistStatus.get(selectedStock.symbol)
                       ? 'bg-dark-accent-green/20 border-dark-accent-green/50'
                       : ''
                   }`}
                 >
-                  {watchlistStatus.get(selectedStock.symbol) ? '✓ In Watchlist' : '+ Add to Watchlist'}
+                  {watchlistStatus.get(selectedStock.symbol) ? (
+                    <span className="inline-flex items-center gap-2">
+                      <NestWiseIcon name="check" size={16} />
+                      In watchlist
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-2">
+                      <NestWiseIcon name="plus" size={16} />
+                      Add to watchlist
+                    </span>
+                  )}
                 </button>
               </div>
             )}
@@ -180,7 +254,10 @@ export default function Explore() {
             {/* AI Overview */}
             <div className="border-t border-dark-border pt-6">
               <h3 className="text-lg font-semibold text-dark-text-primary mb-2 flex items-center gap-2">
-                <span className="text-xl">🤖</span> AI Overview
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-dark-accent-green/10 text-dark-accent-green">
+                  <NestWiseIcon name="bot" size={18} />
+                </span>
+                AI overview
               </h3>
               {aiOverviewLoading && (
                 <div className="flex items-center gap-2 text-dark-text-secondary">
@@ -232,6 +309,8 @@ export default function Explore() {
                 Loading company information...
               </p>
             )}
+
+            <StockDeepDive stock={selectedStock} />
           </div>
         </div>
       ) : (
@@ -260,6 +339,7 @@ export default function Explore() {
                     </div>
                     {user && (
                       <button
+                        type="button"
                         onClick={(e) => handleToggleWatchlist(stock.symbol, e)}
                         className={`ml-2 px-2 py-1 rounded text-sm ${
                           watchlistStatus.get(stock.symbol)
@@ -267,7 +347,11 @@ export default function Explore() {
                             : 'bg-dark-surface text-dark-text-secondary hover:text-dark-text-primary'
                         }`}
                       >
-                        {watchlistStatus.get(stock.symbol) ? '✓' : '+'}
+                        {watchlistStatus.get(stock.symbol) ? (
+                          <NestWiseIcon name="check" size={16} className="text-dark-accent-green" />
+                        ) : (
+                          <NestWiseIcon name="plus" size={16} />
+                        )}
                       </button>
                     )}
                   </div>
@@ -292,5 +376,13 @@ export default function Explore() {
         </>
       )}
     </div>
+  )
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense fallback={<ExploreLoading />}>
+      <ExploreContent />
+    </Suspense>
   )
 }

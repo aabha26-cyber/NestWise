@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server'
 const isPublicRoute = createRouteMatcher([
   '/',
   '/learn',
+  '/learn/(.*)',
+  '/goals',
   '/explore',
   '/dashboard',
   '/dashboard/(.*)',
@@ -15,42 +17,42 @@ const isPublicRoute = createRouteMatcher([
   '/auth/signin(.*)',
   '/auth/signup(.*)',
   '/auth/error',
-  '/api/webhook(.*)',
-  '/api/stocks',
-  '/api/stocks/(.*)',
-  '/api/stock-overview',
-  '/api/portfolio',
-  '/api/portfolio/init',
-  '/api/portfolio/reset',
-  '/api/fear-greed',
-  '/api/chat',
+  /** Let all API handlers run; they return 401 JSON as needed. Otherwise Clerk redirects break client fetch(). */
+  '/api/(.*)',
 ])
 
-export default clerkMiddleware(async (auth, request) => {
-  if (isPublicRoute(request)) return
+// Without a secret key, Clerk middleware cannot authenticate; skip it so the app still runs locally.
+const clerkSecretConfigured = Boolean(process.env.CLERK_SECRET_KEY?.trim())
 
-  const url = request.nextUrl
+export default clerkSecretConfigured
+  ? clerkMiddleware(async (auth, request) => {
+      if (isPublicRoute(request)) return
 
-  // Avoid redirect loop: let through when coming back from Clerk (session may not be set yet on first request)
-  const referer = request.headers.get('referer') ?? ''
-  if (referer.includes('accounts.dev') || referer.includes('clerk.')) return
+      const url = request.nextUrl
 
-  // Clerk callback or redirect params – let through so the flow can complete
-  if (url.searchParams.has('__clerk') || url.searchParams.has('__clerk_ticket')) return
+      // Avoid redirect loop: let through when coming back from Clerk (session may not be set yet on first request)
+      const referer = request.headers.get('referer') ?? ''
+      if (referer.includes('accounts.dev') || referer.includes('clerk.')) return
 
-  // Never redirect to sign-in if we're already on an auth page (safety)
-  if (url.pathname.startsWith('/auth/')) return NextResponse.next()
+      // Clerk callback or redirect params – let through so the flow can complete
+      if (url.searchParams.has('__clerk') || url.searchParams.has('__clerk_ticket')) return
 
-  try {
-    const authObj = await auth()
-    if (!authObj.userId) {
-      const returnBackUrl = url.pathname.startsWith('/auth/') ? '/' : request.url
-      return authObj.redirectToSignIn({ returnBackUrl })
+      // Never redirect to sign-in if we're already on an auth page (safety)
+      if (url.pathname.startsWith('/auth/')) return NextResponse.next()
+
+      try {
+        const authObj = await auth()
+        if (!authObj.userId) {
+          const returnBackUrl = url.pathname.startsWith('/auth/') ? '/' : request.url
+          return authObj.redirectToSignIn({ returnBackUrl })
+        }
+      } catch {
+        // If Clerk fails (e.g. missing env), allow request through so app routes still resolve
+      }
+    })
+  : function middleware() {
+      return NextResponse.next()
     }
-  } catch {
-    // If Clerk fails (e.g. missing env), allow request through so app routes still resolve
-  }
-})
 
 export const config = {
   matcher: [

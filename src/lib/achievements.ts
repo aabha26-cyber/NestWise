@@ -1,5 +1,6 @@
 /**
  * Achievements/badges. Unlocked state per user in localStorage.
+ * `icon` is a Lucide icon name (see NestWiseIcon).
  */
 
 export interface Achievement {
@@ -10,14 +11,14 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first-trade', name: 'First Trade', description: 'Made your first simulated trade', icon: '🎯' },
-  { id: 'first-stock', name: 'First Stock', description: 'Bought your first stock', icon: '📈' },
-  { id: 'diversified-5', name: 'Diversified', description: 'Hold 5+ different stocks', icon: '🎯' },
-  { id: 'learn-basics', name: 'Basics Complete', description: 'Finished Investing Basics course', icon: '📚' },
-  { id: 'learn-all', name: 'Course Graduate', description: 'Completed all learning modules', icon: '🎓' },
-  { id: 'watchlist-5', name: 'Watchlist Pro', description: 'Added 5 stocks to your watchlist', icon: '👀' },
-  { id: 'week-active', name: 'Week Active', description: 'Logged in and traded this week', icon: '🔥' },
-  { id: 'in-the-green', name: 'In the Green', description: 'Portfolio total return above 0%', icon: '💚' },
+  { id: 'first-trade', name: 'First Trade', description: 'Made your first simulated trade', icon: 'target' },
+  { id: 'first-stock', name: 'First Stock', description: 'Bought your first stock', icon: 'trending-up' },
+  { id: 'diversified-5', name: 'Diversified', description: 'Hold 5+ different stocks', icon: 'layout-grid' },
+  { id: 'learn-basics', name: 'Basics Complete', description: 'Finished the first two investing lessons', icon: 'book-open' },
+  { id: 'learn-all', name: 'Course Graduate', description: 'Completed all learning modules', icon: 'graduation-cap' },
+  { id: 'watchlist-5', name: 'Watchlist Pro', description: 'Added 5 stocks to your watchlist', icon: 'eye' },
+  { id: 'week-active', name: 'Week Active', description: 'Logged in and traded this week', icon: 'flame' },
+  { id: 'in-the-green', name: 'In the Green', description: 'Portfolio total return above 0%', icon: 'leaf' },
 ]
 
 const KEY_PREFIX = 'nestwise_achievements_'

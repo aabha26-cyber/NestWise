@@ -6,6 +6,7 @@ import { useUser } from '@clerk/nextjs'
 import { getSimulatorState } from '@/lib/simulatorStorage'
 import { getMultipleStocks } from '@/lib/stockApi'
 import { getOrCreatePortfolio, getHoldings } from '@/lib/portfolio'
+import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
 
 export default function Home() {
   const { isSignedIn, user } = useUser()
@@ -79,7 +80,7 @@ export default function Home() {
               </div>
               <Link href="/dashboard" className="btn-primary inline-flex items-center gap-2">
                 View dashboard
-                <span>→</span>
+                <NestWiseIcon name="arrow-right" size={18} className="opacity-90" />
               </Link>
             </div>
           </div>
@@ -90,17 +91,19 @@ export default function Home() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
         <div className="text-center">
           <h1 className="text-5xl sm:text-6xl font-bold text-dark-text-primary mb-6">
-            Learn investing without pressure
+            Your calm place for money skills
           </h1>
           <p className="text-xl text-dark-text-secondary max-w-2xl mx-auto mb-12">
-            Track markets, simulate portfolios, and ask AI — no advice, just clarity.
+            Budgeting, credit, taxes, insurance, investing — then practice in a simulator and ask AI. Educational, not advice.
           </p>
         </div>
 
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-6 mt-16 max-w-5xl mx-auto">
-          <Link href="/learn" className="card hover:border-dark-accent-green/50 transition-all duration-300 group">
-            <div className="text-4xl mb-4">📚</div>
+          <Link href="/learn" className="card hover:border-dark-accent-green/50 transition-all duration-300 group hover:shadow-lg hover:shadow-dark-accent-green/5">
+            <div className="mb-5">
+              <IconOrb name="book-open" size={24} />
+            </div>
             <h3 className="text-xl font-semibold text-dark-text-primary mb-2 group-hover:text-dark-accent-green transition-colors">
               Learn
             </h3>
@@ -109,8 +112,10 @@ export default function Home() {
             </p>
           </Link>
 
-          <Link href="/portfolio" className="card hover:border-dark-accent-green/50 transition-all duration-300 group">
-            <div className="text-4xl mb-4">💼</div>
+          <Link href="/portfolio" className="card hover:border-dark-accent-green/50 transition-all duration-300 group hover:shadow-lg hover:shadow-dark-accent-green/5">
+            <div className="mb-5">
+              <IconOrb name="briefcase" size={24} />
+            </div>
             <h3 className="text-xl font-semibold text-dark-text-primary mb-2 group-hover:text-dark-accent-green transition-colors">
               Simulate
             </h3>
@@ -119,13 +124,15 @@ export default function Home() {
             </p>
           </Link>
 
-          <Link href="/chat" className="card hover:border-dark-accent-green/50 transition-all duration-300 group">
-            <div className="text-4xl mb-4">🤖</div>
+          <Link href="/chat" className="card hover:border-dark-accent-green/50 transition-all duration-300 group hover:shadow-lg hover:shadow-dark-accent-green/5">
+            <div className="mb-5">
+              <IconOrb name="bot" size={24} />
+            </div>
             <h3 className="text-xl font-semibold text-dark-text-primary mb-2 group-hover:text-dark-accent-green transition-colors">
               Ask AI
             </h3>
             <p className="text-dark-text-secondary">
-              Get educational answers to your investing questions. Always safe, never advice.
+              Get educational answers about money — always framed as learning, not personalized advice.
             </p>
           </Link>
         </div>
@@ -211,8 +218,9 @@ export default function Home() {
               </button>
             </form>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
-              <Link href="/suggestions" className="text-dark-accent-green hover:underline font-medium">
-                See top 3 investment options →
+              <Link href="/suggestions" className="inline-flex items-center gap-1.5 text-dark-accent-green hover:underline font-medium">
+                See top 3 investment options
+                <NestWiseIcon name="arrow-right" size={16} />
               </Link>
               <Link href="/chat" className="text-dark-text-muted hover:text-dark-text-secondary">
                 Full chat
@@ -236,8 +244,8 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1 space-y-8">
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-dark-accent-green/20 flex items-center justify-center text-2xl">
-                  💻
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-dark-accent-green/15 ring-1 ring-dark-accent-green/25 flex items-center justify-center text-dark-accent-green">
+                  <NestWiseIcon name="laptop" size={22} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-dark-text-primary mb-1">Practice with virtual money</h3>
@@ -247,8 +255,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-dark-accent-green/20 flex items-center justify-center text-2xl">
-                  📈
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-dark-accent-green/15 ring-1 ring-dark-accent-green/25 flex items-center justify-center text-dark-accent-green">
+                  <NestWiseIcon name="trending-up" size={22} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-dark-text-primary mb-1">Trade a wide range of stocks & ETFs</h3>
@@ -258,8 +266,8 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-dark-accent-green/20 flex items-center justify-center text-2xl">
-                  🏆
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-dark-accent-green/15 ring-1 ring-dark-accent-green/25 flex items-center justify-center text-dark-accent-green">
+                  <NestWiseIcon name="trophy" size={22} />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-dark-text-primary mb-1">Learn at your own pace</h3>
@@ -271,7 +279,7 @@ export default function Home() {
               <div className="pt-4">
                 <Link href="/portfolio" className="btn-primary inline-flex items-center gap-2">
                   <span>Open simulator</span>
-                  <span>→</span>
+                  <NestWiseIcon name="arrow-right" size={18} className="opacity-90" />
                 </Link>
               </div>
             </div>
@@ -279,7 +287,11 @@ export default function Home() {
               <div className="relative w-full max-w-sm aspect-square rounded-2xl bg-dark-card border border-dark-border flex items-center justify-center overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-gradient-to-br from-dark-accent-green to-transparent" />
                 <div className="relative text-center p-8">
-                  <div className="text-6xl sm:text-7xl mb-4">📊</div>
+                  <div className="flex justify-center mb-5">
+                    <span className="inline-flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-3xl bg-dark-accent-green/10 text-dark-accent-green ring-1 ring-dark-accent-green/30">
+                      <NestWiseIcon name="bar-chart-3" size={44} />
+                    </span>
+                  </div>
                   <p className="text-dark-text-primary font-semibold text-lg">Portfolio view</p>
                   <p className="text-dark-text-secondary text-sm mt-1">Cash • Holdings • P&L</p>
                   <div className="mt-6 flex justify-center gap-4 text-sm">

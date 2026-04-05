@@ -4,8 +4,9 @@ import Navigation from '@/components/Navigation'
 import Providers from '@/components/Providers'
 
 export const metadata: Metadata = {
-  title: 'NestWise - Calm investing, clearly explained',
-  description: 'Learn investing without pressure. Track markets, simulate portfolios, and ask AI — no advice, just clarity.',
+  title: 'NestWise — Financial literacy, clearly explained',
+  description:
+    'Budgeting, credit, taxes, insurance, investing, and more. Courses, daily quiz, and a simulator — educational, not advice.',
 }
 
 export default function RootLayout({

@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 // Friendly, best-friend tone + educational with specific examples
 const SYSTEM_PROMPT = `You are the user's best friend who happens to know a lot about investing. You're warm, supportive, and super easy to talk to—like chatting with a smart friend who genuinely wants to help.
 
@@ -32,9 +28,12 @@ const FALLBACK_MESSAGE =
 
 export async function POST(request: NextRequest) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
       return NextResponse.json({ message: FALLBACK_MESSAGE })
     }
+
+    const openai = new OpenAI({ apiKey })
 
     const { messages } = await request.json()
 

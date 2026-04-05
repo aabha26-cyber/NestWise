@@ -21,6 +21,7 @@ import {
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { getSectorBreakdown, getPortfolioRiskScore, getSector } from '@/lib/sectors'
+import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
 
 interface HoldingWithStock extends Holding {
   stock?: StockData
@@ -349,7 +350,9 @@ function PortfolioPageContent() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card max-w-xl mx-auto text-center py-12 px-8">
-          <div className="text-5xl mb-4">💼</div>
+          <div className="flex justify-center mb-6">
+            <IconOrb name="briefcase" size={36} large />
+          </div>
           <h2 className="text-2xl font-bold text-dark-text-primary mb-2">Stock Market Simulator</h2>
           <p className="text-dark-text-secondary mb-8">
             Practice trading with virtual money. No deposit needed. Choose your starting balance and invest in any stock.
@@ -426,6 +429,9 @@ function PortfolioPageContent() {
           <Link href="/portfolio/analytics" className="btn-secondary text-sm">
             Analytics
           </Link>
+          <Link href="/portfolio/report-card" className="btn-secondary text-sm">
+            Report card
+          </Link>
           {portfolio?.id === 'local' && (
             <button
               type="button"
@@ -452,8 +458,9 @@ function PortfolioPageContent() {
           >
             Reset simulator
           </button>
-          <div className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 px-4 py-2 rounded-lg text-sm font-semibold">
-            ⚠️ Simulation Mode
+          <div className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-400 px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-2">
+            <NestWiseIcon name="alert-triangle" size={18} className="text-yellow-400 shrink-0" />
+            Simulation mode
             {portfolio?.id === 'local' && (
               <span className="ml-1 font-normal text-yellow-400/90">(saved in this browser)</span>
             )}

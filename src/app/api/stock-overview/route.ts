@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 const SYSTEM_PROMPT = `You are an educational investing assistant. You provide short, plain-English overviews of companies/stocks for beginners.
 
 RULES:
@@ -16,12 +12,15 @@ RULES:
 
 export async function POST(request: NextRequest) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) {
       return NextResponse.json(
         { overview: null, error: 'AI overview not configured.' },
         { status: 200 }
       )
     }
+
+    const openai = new OpenAI({ apiKey })
 
     const body = await request.json()
     const { symbol, name, description } = body as {

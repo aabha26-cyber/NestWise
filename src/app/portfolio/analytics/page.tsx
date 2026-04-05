@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
 import { getOrCreatePortfolio, getHoldings, getPortfolioHistory } from '@/lib/portfolio'
 import { getMultipleStocks, type StockData } from '@/lib/stockApi'
@@ -167,6 +168,12 @@ export default function AnalyticsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Link
+        href="/portfolio"
+        className="inline-flex items-center gap-1 text-sm text-dark-accent-green hover:underline mb-6"
+      >
+        ← Portfolio
+      </Link>
       <h1 className="text-3xl font-bold text-dark-text-primary mb-8">Portfolio Analytics</h1>
 
       {/* Summary Cards */}

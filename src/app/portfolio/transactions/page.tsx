@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
 import { getOrCreatePortfolio, getTransactions, type Transaction } from '@/lib/portfolio'
 import { format } from 'date-fns'
@@ -53,6 +54,12 @@ export default function TransactionsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Link
+        href="/portfolio"
+        className="inline-flex items-center gap-1 text-sm text-dark-accent-green hover:underline mb-6"
+      >
+        ← Portfolio
+      </Link>
       <h1 className="text-3xl font-bold text-dark-text-primary mb-8">Transaction History</h1>
 
       <div className="card">

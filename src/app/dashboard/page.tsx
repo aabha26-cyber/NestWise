@@ -24,7 +24,7 @@ import {
   applyRecurringDepositIfDue,
 } from '@/lib/simulatorStorage'
 import { getCompletedLessonIds } from '@/lib/learnProgress'
-import { getAllLessonIds } from '@/lib/courses'
+import { getAllLessonIds, BASICS_LESSON_IDS } from '@/lib/courses'
 import {
   ACHIEVEMENTS,
   getUnlockedAchievementIds,
@@ -33,6 +33,7 @@ import {
 } from '@/lib/achievements'
 import { getSectorBreakdown, getPortfolioRiskScore } from '@/lib/sectors'
 import { format } from 'date-fns'
+import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
 
 ChartJS.register(
   CategoryScale,
@@ -171,8 +172,7 @@ export default function Dashboard() {
         if (localState.holdings && localState.holdings.length >= 1) unlockAchievement(user.id, 'first-stock')
         if (localState.holdings && localState.holdings.length >= 5) unlockAchievement(user.id, 'diversified-5')
         if (totalReturn > 0) unlockAchievement(user.id, 'in-the-green')
-        const basicsLessonIds = ['what-is-stock', 'market-basics']
-        if (basicsLessonIds.every((id) => completedIds.includes(id))) unlockAchievement(user.id, 'learn-basics')
+        if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) unlockAchievement(user.id, 'learn-basics')
         if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) unlockAchievement(user.id, 'learn-all')
         unlockAchievement(user.id, 'week-active')
         setUnlockedAchievements(getUnlockedAchievements(user.id))
@@ -214,8 +214,7 @@ export default function Dashboard() {
 
       const completedIds = getCompletedLessonIds(user.id)
       setLessonsCompleted(completedIds.length)
-      const basicsLessonIds = ['what-is-stock', 'market-basics']
-      if (basicsLessonIds.every((id) => completedIds.includes(id))) unlockAchievement(user.id, 'learn-basics')
+      if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) unlockAchievement(user.id, 'learn-basics')
       if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) unlockAchievement(user.id, 'learn-all')
       setUnlockedAchievements(getUnlockedAchievements(user.id))
       setTradesThisWeek(0)
@@ -646,8 +645,9 @@ export default function Dashboard() {
           <p className="text-dark-text-secondary text-sm">
             {tradesThisWeek} simulated trade{tradesThisWeek !== 1 ? 's' : ''} · {lessonsCompleted} lesson{lessonsCompleted !== 1 ? 's' : ''} completed
           </p>
-          <Link href="/learn" className="mt-2 inline-block text-sm text-dark-accent-green hover:underline">
-            Continue learning →
+          <Link href="/learn" className="mt-2 inline-flex items-center gap-1 text-sm text-dark-accent-green hover:underline">
+            Continue learning
+            <NestWiseIcon name="arrow-right" size={14} />
           </Link>
         </div>
         <div className="card">
@@ -668,7 +668,7 @@ export default function Dashboard() {
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-dark-accent-green/20 text-dark-accent-green text-sm"
                   title={a.description}
                 >
-                  <span>{a.icon}</span>
+                  <NestWiseIcon name={a.icon} size={16} className="text-dark-accent-green shrink-0" />
                   <span>{a.name}</span>
                 </span>
               ))
@@ -680,7 +680,9 @@ export default function Dashboard() {
       {/* Quick Actions */}
       <div className="grid md:grid-cols-3 gap-6">
         <Link href="/portfolio" className="card hover:border-dark-accent-green/50 transition-all duration-300 group">
-          <div className="text-3xl mb-3">💼</div>
+          <div className="mb-4">
+            <IconOrb name="briefcase" size={22} />
+          </div>
           <h3 className="text-lg font-semibold text-dark-text-primary mb-2 group-hover:text-dark-accent-green transition-colors">
             Portfolio
           </h3>
@@ -690,7 +692,9 @@ export default function Dashboard() {
         </Link>
 
         <Link href="/explore" className="card hover:border-dark-accent-green/50 transition-all duration-300 group">
-          <div className="text-3xl mb-3">🔍</div>
+          <div className="mb-4">
+            <IconOrb name="search" size={22} />
+          </div>
           <h3 className="text-lg font-semibold text-dark-text-primary mb-2 group-hover:text-dark-accent-green transition-colors">
             Explore Stocks
           </h3>
@@ -700,7 +704,9 @@ export default function Dashboard() {
         </Link>
 
         <Link href="/chat" className="card hover:border-dark-accent-green/50 transition-all duration-300 group">
-          <div className="text-3xl mb-3">💬</div>
+          <div className="mb-4">
+            <IconOrb name="message-circle" size={22} />
+          </div>
           <h3 className="text-lg font-semibold text-dark-text-primary mb-2 group-hover:text-dark-accent-green transition-colors">
             Ask AI
           </h3>
