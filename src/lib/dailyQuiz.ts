@@ -1,3 +1,5 @@
+import { supabase, isSupabaseConfigured } from './supabase'
+
 export type QuizQuestion = {
   id: string
   question: string
@@ -388,38 +390,160 @@ export function getTodaysQuiz(date = new Date()): QuizQuestion[] {
   return picked.map((q, i) => withShuffledOptions(q, hash(`${key}-${q.id}-${i}`)))
 }
 
+/** Legacy global keys (pre–per-user); migrated into v2 when a userId is known */
 const STREAK_KEY = 'nestwise_quiz_streak_v1'
 const LAST_DONE_KEY = 'nestwise_quiz_last_done_day_v1'
+const USER_STREAK_PREFIX = 'nestwise_quiz_streak_v2_'
 
-export function getQuizStreak(): { streak: number; lastDoneDay: string | null } {
-  if (typeof window === 'undefined') return { streak: 0, lastDoneDay: null }
+type StreakSnap = { streak: number; lastDone: string | null }
+
+function readLegacyGlobalStreak(): StreakSnap {
+  if (typeof window === 'undefined') return { streak: 0, lastDone: null }
   try {
     const streak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10) || 0
-    const lastDoneDay = localStorage.getItem(LAST_DONE_KEY)
-    return { streak, lastDoneDay }
+    const lastDone = localStorage.getItem(LAST_DONE_KEY)
+    return { streak, lastDone }
   } catch {
-    return { streak: 0, lastDoneDay: null }
+    return { streak: 0, lastDone: null }
   }
 }
 
-/** Call once when user finishes the daily quiz (any score). Streak = consecutive calendar days completed. */
-export function recordQuizFinished(today = new Date()): { streak: number } {
-  if (typeof window === 'undefined') return { streak: 0 }
+function readUserJsonStreak(userId: string): StreakSnap {
+  if (typeof window === 'undefined') return { streak: 0, lastDone: null }
+  try {
+    const raw = localStorage.getItem(USER_STREAK_PREFIX + userId)
+    if (!raw) return { streak: 0, lastDone: null }
+    const j = JSON.parse(raw) as { streak?: number; lastDoneDay?: string | null }
+    return {
+      streak: Number(j.streak) || 0,
+      lastDone: typeof j.lastDoneDay === 'string' ? j.lastDoneDay : null,
+    }
+  } catch {
+    return { streak: 0, lastDone: null }
+  }
+}
+
+function writeUserJsonStreak(userId: string, streak: number, lastDone: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(USER_STREAK_PREFIX + userId, JSON.stringify({ streak, lastDoneDay: lastDone }))
+  } catch (e) {
+    console.error('Quiz streak local save failed:', e)
+  }
+}
+
+/** Copy legacy global streak into per-user storage once so signed-in users keep continuity */
+function migrateLegacyIntoUser(userId: string): void {
+  if (typeof window === 'undefined') return
+  if (localStorage.getItem(USER_STREAK_PREFIX + userId)) return
+  const leg = readLegacyGlobalStreak()
+  if (leg.lastDone) writeUserJsonStreak(userId, leg.streak, leg.lastDone)
+}
+
+function bestStreakSnapshot(parts: StreakSnap[]): StreakSnap {
+  let best: StreakSnap = { streak: 0, lastDone: null }
+  for (const p of parts) {
+    if (!p.lastDone) continue
+    if (!best.lastDone || p.lastDone > best.lastDone) {
+      best = { lastDone: p.lastDone, streak: p.streak }
+    } else if (p.lastDone === best.lastDone && p.streak > best.streak) {
+      best = { lastDone: best.lastDone, streak: p.streak }
+    }
+  }
+  return best
+}
+
+function computeNextStreak(
+  todayStr: string,
+  yStr: string,
+  lastDone: string | null,
+  prevStreak: number
+): number {
+  if (lastDone === todayStr) return prevStreak
+  if (lastDone === yStr) return prevStreak + 1
+  return 1
+}
+
+async function readDbStreak(userId: string): Promise<StreakSnap> {
+  if (!isSupabaseConfigured || !supabase) return { streak: 0, lastDone: null }
+  try {
+    const { data, error } = await supabase
+      .from('user_quiz_streaks')
+      .select('streak, last_done_day')
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (error) throw error
+    if (!data) return { streak: 0, lastDone: null }
+    return {
+      streak: Number(data.streak) || 0,
+      lastDone: data.last_done_day ?? null,
+    }
+  } catch (e) {
+    console.error('Supabase quiz streak read failed:', e)
+    return { streak: 0, lastDone: null }
+  }
+}
+
+export async function getQuizStreak(userId?: string): Promise<{ streak: number; lastDoneDay: string | null }> {
+  if (userId) {
+    migrateLegacyIntoUser(userId)
+    const db = await readDbStreak(userId)
+    const loc = readUserJsonStreak(userId)
+    const leg = readLegacyGlobalStreak()
+    const merged = bestStreakSnapshot([db, loc, leg])
+    return { streak: merged.streak, lastDoneDay: merged.lastDone }
+  }
+  const g = readLegacyGlobalStreak()
+  return { streak: g.streak, lastDoneDay: g.lastDone }
+}
+
+export async function recordQuizFinished(userId?: string, today = new Date()): Promise<{ streak: number }> {
   const todayStr = dayKey(today)
-  const lastDone = localStorage.getItem(LAST_DONE_KEY)
-  const prev = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10) || 0
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yStr = dayKey(yesterday)
+
+  if (!userId) {
+    if (typeof window === 'undefined') return { streak: 0 }
+    const leg = readLegacyGlobalStreak()
+    if (leg.lastDone === todayStr) return { streak: leg.streak }
+    const next = computeNextStreak(todayStr, yStr, leg.lastDone, leg.streak)
+    localStorage.setItem(STREAK_KEY, String(next))
+    localStorage.setItem(LAST_DONE_KEY, todayStr)
+    return { streak: next }
+  }
+
+  migrateLegacyIntoUser(userId)
+  const db = await readDbStreak(userId)
+  const loc = readUserJsonStreak(userId)
+  const leg = readLegacyGlobalStreak()
+  const merged = bestStreakSnapshot([db, loc, leg])
+  const prev = merged.streak
+  const lastDone = merged.lastDone
 
   if (lastDone === todayStr) {
     return { streak: prev }
   }
 
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-  const yStr = dayKey(yesterday)
+  const nextStreak = computeNextStreak(todayStr, yStr, lastDone, prev)
 
-  const next = lastDone === yStr ? prev + 1 : 1
-
-  localStorage.setItem(STREAK_KEY, String(next))
+  writeUserJsonStreak(userId, nextStreak, todayStr)
+  localStorage.setItem(STREAK_KEY, String(nextStreak))
   localStorage.setItem(LAST_DONE_KEY, todayStr)
-  return { streak: next }
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { error } = await supabase
+        .from('user_quiz_streaks')
+        .upsert(
+          { user_id: userId, streak: nextStreak, last_done_day: todayStr },
+          { onConflict: 'user_id' }
+        )
+      if (error) throw error
+    } catch (e) {
+      console.error('Supabase quiz streak upsert failed (local streak still saved):', e)
+    }
+  }
+
+  return { streak: nextStreak }
 }

@@ -22,6 +22,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { getSectorBreakdown, getPortfolioRiskScore, getSector } from '@/lib/sectors'
 import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
+import { isSupabaseConfigured } from '@/lib/supabase'
 
 interface HoldingWithStock extends Holding {
   stock?: StockData
@@ -99,6 +100,37 @@ function PortfolioPageContent() {
         return
       }
       applyRecurringDepositIfDue(user.id)
+
+      if (isSupabaseConfigured) {
+        try {
+          const res = await fetch('/api/portfolio', { credentials: 'include' })
+          if (res.ok) {
+            const { portfolio: portfolioData, holdings: holdingsData } = await res.json()
+            if (portfolioData) {
+              setShowStartSimulator(false)
+              setPortfolio(portfolioData)
+              setCashBalance(portfolioData.cash_balance)
+              const holdingsList = Array.isArray(holdingsData) ? holdingsData : []
+              const symbols = holdingsList.map((h: { symbol: string }) => h.symbol)
+              const stockDataMap = new Map<string, StockData>()
+              if (symbols.length > 0) {
+                const stocks = await getMultipleStocks(symbols)
+                stocks.forEach((stock) => stockDataMap.set(stock.symbol, stock))
+              }
+              const holdingsWithStocks: HoldingWithStock[] = holdingsList.map((holding: HoldingWithStock) => ({
+                ...holding,
+                stock: stockDataMap.get(holding.symbol),
+              }))
+              setHoldings(holdingsWithStocks)
+              setLoading(false)
+              return
+            }
+          }
+        } catch {
+          /* fall through to local */
+        }
+      }
+
       const localState = getSimulatorState(user.id)
       if (localState) {
         setPortfolio({ id: 'local' })
@@ -758,7 +790,9 @@ function PortfolioPageContent() {
       {/* Trade any stock */}
       <div className="card">
         <h2 className="text-xl font-semibold text-dark-text-primary mb-4">Trade stocks & ETFs</h2>
-        <p className="text-dark-text-secondary text-sm mb-4">Search by company name or symbol. Practice with virtual money—no real money involved.</p>
+        <p className="text-dark-text-secondary text-sm mb-4">
+          Search by company name or ticker (U.S. and many international listings via Yahoo Finance). Results are matches, not an exhaustive list of every listed company worldwide. Practice with virtual money—no real money involved.
+        </p>
         <input
           type="text"
           value={searchQuery}
@@ -769,7 +803,7 @@ function PortfolioPageContent() {
         {searchLoading && <p className="text-dark-text-muted text-sm mb-2">Searching...</p>}
         {searchResults.length > 0 && !selectedStockForTrade && (
           <div className="border border-dark-border rounded-lg divide-y divide-dark-border max-h-64 overflow-y-auto mb-4">
-            {searchResults.slice(0, 12).map((stock) => (
+            {searchResults.slice(0, 40).map((stock) => (
               <button
                 key={stock.symbol}
                 type="button"

@@ -1,7 +1,9 @@
 /**
- * Achievements/badges. Unlocked state per user in localStorage.
+ * Achievements/badges. Persisted to Supabase when configured, localStorage fallback.
  * `icon` is a Lucide icon name (see NestWiseIcon).
  */
+
+import { supabase, isSupabaseConfigured } from './supabase'
 
 export interface Achievement {
   id: string
@@ -23,7 +25,7 @@ export const ACHIEVEMENTS: Achievement[] = [
 
 const KEY_PREFIX = 'nestwise_achievements_'
 
-export function getUnlockedAchievementIds(userId: string): string[] {
+function getLocalUnlockedIds(userId: string): string[] {
   if (typeof window === 'undefined') return []
   try {
     const raw = localStorage.getItem(KEY_PREFIX + userId)
@@ -35,7 +37,7 @@ export function getUnlockedAchievementIds(userId: string): string[] {
   }
 }
 
-export function setUnlockedAchievementIds(userId: string, ids: string[]): void {
+function setLocalUnlockedIds(userId: string, ids: string[]): void {
   if (typeof window === 'undefined') return
   try {
     localStorage.setItem(KEY_PREFIX + userId, JSON.stringify(ids))
@@ -44,18 +46,54 @@ export function setUnlockedAchievementIds(userId: string, ids: string[]): void {
   }
 }
 
-export function unlockAchievement(userId: string, achievementId: string): boolean {
-  const unlocked = getUnlockedAchievementIds(userId)
+export async function getUnlockedAchievementIds(userId: string): Promise<string[]> {
+  const local = getLocalUnlockedIds(userId)
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('user_achievements')
+        .select('achievement_id')
+        .eq('user_id', userId)
+      if (error) throw error
+      const remote = (data || []).map((r) => r.achievement_id)
+      return Array.from(new Set(local.concat(remote)))
+    } catch (e) {
+      console.error('Supabase achievements fetch failed, using localStorage:', e)
+    }
+  }
+  return local
+}
+
+export async function unlockAchievement(userId: string, achievementId: string): Promise<boolean> {
+  const unlocked = await getUnlockedAchievementIds(userId)
   if (unlocked.includes(achievementId)) return false
-  setUnlockedAchievementIds(userId, [...unlocked, achievementId])
+
+  const local = getLocalUnlockedIds(userId)
+  if (!local.includes(achievementId)) {
+    setLocalUnlockedIds(userId, [...local, achievementId])
+  }
+
+  if (isSupabaseConfigured && supabase) {
+    try {
+      const { error } = await supabase
+        .from('user_achievements')
+        .upsert({ user_id: userId, achievement_id: achievementId }, { onConflict: 'user_id,achievement_id' })
+      if (error) throw error
+      return true
+    } catch (e) {
+      console.error('Supabase achievement unlock failed:', e)
+    }
+  }
+
   return true
 }
 
-export function isUnlocked(userId: string, achievementId: string): boolean {
-  return getUnlockedAchievementIds(userId).includes(achievementId)
+export async function isUnlocked(userId: string, achievementId: string): Promise<boolean> {
+  const ids = await getUnlockedAchievementIds(userId)
+  return ids.includes(achievementId)
 }
 
-export function getUnlockedAchievements(userId: string): Achievement[] {
-  const ids = getUnlockedAchievementIds(userId)
+export async function getUnlockedAchievements(userId: string): Promise<Achievement[]> {
+  const ids = await getUnlockedAchievementIds(userId)
   return ACHIEVEMENTS.filter((a) => ids.includes(a.id))
 }

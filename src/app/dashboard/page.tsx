@@ -15,7 +15,8 @@ import {
   Legend,
   Filler,
 } from 'chart.js'
-import { getOrCreatePortfolio, getHoldings, getPortfolioHistory } from '@/lib/portfolio'
+import { getOrCreatePortfolio, getHoldings, getPortfolioHistory, getPortfolio } from '@/lib/portfolio'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { getMultipleStocks } from '@/lib/stockApi'
 import {
   getSimulatorState,
@@ -100,6 +101,109 @@ export default function Dashboard() {
       if (!user?.id) return
 
       applyRecurringDepositIfDue(user.id)
+
+      if (isSupabaseConfigured) {
+        try {
+          const remote = await getPortfolio(user.id)
+          if (remote) {
+            setIsLocalSim(false)
+            setCashBalance(remote.cash_balance)
+            setInitialCash(remote.cash_balance)
+
+            const holdings = await getHoldings(remote.id)
+            let stocksValue = 0
+            const holdingValues: Array<{ symbol: string; name?: string; value: number; cost: number }> = []
+            if (holdings.length > 0) {
+              const stocks = await getMultipleStocks(holdings.map((h) => h.symbol))
+              const stockMap = new Map(stocks.map((s) => [s.symbol, s]))
+              for (const h of holdings) {
+                const stock = stockMap.get(h.symbol)
+                const price = stock?.price ?? 0
+                const value = price * h.shares
+                const cost = (h.average_cost || 0) * h.shares
+                stocksValue += value
+                holdingValues.push({
+                  symbol: h.symbol,
+                  name: stock?.name,
+                  value,
+                  cost,
+                })
+              }
+            }
+            const totalValue = stocksValue + remote.cash_balance
+            setPortfolioValue(totalValue)
+            setInvestedValue(stocksValue)
+            setUnrealizedGains(holdingValues.reduce((s, h) => s + (h.value - h.cost), 0))
+            setRealizedGains(0)
+
+            const completedIds = await getCompletedLessonIds(user.id)
+            setLessonsCompleted(completedIds.length)
+            if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) await unlockAchievement(user.id, 'learn-basics')
+            if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) await unlockAchievement(user.id, 'learn-all')
+            setUnlockedAchievements(await getUnlockedAchievements(user.id))
+            setTradesThisWeek(0)
+
+            const totalForPercent = totalValue || 1
+            setTopHoldings(
+              holdingValues
+                .sort((a, b) => b.value - a.value)
+                .slice(0, 5)
+                .map((h) => ({
+                  symbol: h.symbol,
+                  name: h.name,
+                  value: h.value,
+                  percent: (h.value / totalForPercent) * 100,
+                }))
+            )
+
+            const days = daysForTimeframe[chartTimeframe] ?? 365
+            const history = await getPortfolioHistory(remote.id, Math.min(days, 365))
+            if (history.length >= 2) {
+              setDailyChange(totalValue - (history[history.length - 2]?.total_value ?? totalValue))
+            } else {
+              setDailyChange(0)
+            }
+
+            if (history.length > 0) {
+              setChartData({
+                labels: history.map((h) => format(new Date(h.recorded_at), 'MMM d')),
+                datasets: [
+                  {
+                    label: 'Portfolio Value',
+                    data: history.map((h) => h.total_value),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                  },
+                ],
+              })
+            } else {
+              setChartData({
+                labels: [format(new Date(), 'MMM d')],
+                datasets: [
+                  {
+                    label: 'Portfolio Value',
+                    data: [totalValue],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                  },
+                ],
+              })
+            }
+
+            setLoading(false)
+            return
+          }
+        } catch (e) {
+          console.error('Dashboard: remote portfolio load failed:', e)
+        }
+      }
+
       const localState = getSimulatorState(user.id)
       if (localState) {
         setIsLocalSim(true)
@@ -161,21 +265,21 @@ export default function Dashboard() {
         ).length
         setTradesThisWeek(txThisWeek)
 
-        const completedIds = getCompletedLessonIds(user.id)
+        const completedIds = await getCompletedLessonIds(user.id)
         setLessonsCompleted(completedIds.length)
 
         const totalReturn =
           localState.initialCash > 0
             ? (localState.cashBalance + stocksValue - localState.initialCash) / localState.initialCash
             : 0
-        if (localState.transactions && localState.transactions.length >= 1) unlockAchievement(user.id, 'first-trade')
-        if (localState.holdings && localState.holdings.length >= 1) unlockAchievement(user.id, 'first-stock')
-        if (localState.holdings && localState.holdings.length >= 5) unlockAchievement(user.id, 'diversified-5')
-        if (totalReturn > 0) unlockAchievement(user.id, 'in-the-green')
-        if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) unlockAchievement(user.id, 'learn-basics')
-        if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) unlockAchievement(user.id, 'learn-all')
-        unlockAchievement(user.id, 'week-active')
-        setUnlockedAchievements(getUnlockedAchievements(user.id))
+        if (localState.transactions && localState.transactions.length >= 1) await unlockAchievement(user.id, 'first-trade')
+        if (localState.holdings && localState.holdings.length >= 1) await unlockAchievement(user.id, 'first-stock')
+        if (localState.holdings && localState.holdings.length >= 5) await unlockAchievement(user.id, 'diversified-5')
+        if (totalReturn > 0) await unlockAchievement(user.id, 'in-the-green')
+        if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) await unlockAchievement(user.id, 'learn-basics')
+        if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) await unlockAchievement(user.id, 'learn-all')
+        await unlockAchievement(user.id, 'week-active')
+        setUnlockedAchievements(await getUnlockedAchievements(user.id))
 
         setLoading(false)
         return
@@ -212,11 +316,11 @@ export default function Dashboard() {
       setUnrealizedGains(holdingValues.reduce((s, h) => s + (h.value - h.cost), 0))
       setRealizedGains(0)
 
-      const completedIds = getCompletedLessonIds(user.id)
+      const completedIds = await getCompletedLessonIds(user.id)
       setLessonsCompleted(completedIds.length)
-      if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) unlockAchievement(user.id, 'learn-basics')
-      if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) unlockAchievement(user.id, 'learn-all')
-      setUnlockedAchievements(getUnlockedAchievements(user.id))
+      if (BASICS_LESSON_IDS.every((id) => completedIds.includes(id))) await unlockAchievement(user.id, 'learn-basics')
+      if (completedIds.length >= getAllLessonIds().length && getAllLessonIds().length > 0) await unlockAchievement(user.id, 'learn-all')
+      setUnlockedAchievements(await getUnlockedAchievements(user.id))
       setTradesThisWeek(0)
 
       const totalForPercent = totalValue || 1

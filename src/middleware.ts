@@ -14,6 +14,7 @@ const isPublicRoute = createRouteMatcher([
   '/watchlist',
   '/chat',
   '/suggestions',
+  '/profile(.*)',
   '/auth/signin(.*)',
   '/auth/signup(.*)',
   '/auth/error',

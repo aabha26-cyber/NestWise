@@ -134,7 +134,7 @@ export async function searchStocks(query: string): Promise<StockData[]> {
   if (typeof window !== 'undefined') {
     try {
       const searchRes = await fetch(
-        `/api/stocks/search?q=${encodeURIComponent(query.trim())}&limit=20`
+        `/api/stocks/search?q=${encodeURIComponent(query.trim())}&limit=40`
       )
       if (!searchRes.ok) return []
       const { quotes } = await searchRes.json()

@@ -32,7 +32,7 @@ export default function GoalsPage() {
 
   useEffect(() => {
     if (!user?.id) return
-    setGoalState(getGoal(user.id))
+    getGoal(user.id).then((g) => setGoalState(g))
   }, [user?.id])
 
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function GoalsPage() {
     )
   }
 
-  const saveGoal = () => {
+  const saveGoal = async () => {
     const n = parseFloat(amount)
     if (!label.trim() || !Number.isFinite(n) || n <= 0) return
     const g: InvestingGoal = {
@@ -115,7 +115,7 @@ export default function GoalsPage() {
       targetAmount: n,
       createdAt: new Date().toISOString(),
     }
-    setGoal(user.id, g)
+    await setGoal(user.id, g)
     setGoalState(g)
   }
 
@@ -184,8 +184,8 @@ export default function GoalsPage() {
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  clearGoal(user.id)
+                onClick={async () => {
+                  await clearGoal(user.id)
                   setGoalState(null)
                   setLabel('')
                   setAmount('100')

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import confetti from 'canvas-confetti'
+import { useUser } from '@clerk/nextjs'
 import {
   getTodaysQuiz,
   recordQuizFinished,
@@ -12,6 +13,7 @@ import {
 import { NestWiseIcon } from '@/components/NestWiseIcon'
 
 export default function DailyQuizPage() {
+  const { user } = useUser()
   const questions = useMemo(() => getTodaysQuiz(), [])
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
@@ -27,8 +29,8 @@ export default function DailyQuizPage() {
   }, [score])
 
   useEffect(() => {
-    setStreak(getQuizStreak().streak)
-  }, [finished])
+    getQuizStreak(user?.id).then((s) => setStreak(s.streak))
+  }, [finished, user?.id])
 
   const q: QuizQuestion | undefined = questions[index]
 
@@ -49,11 +51,11 @@ export default function DailyQuizPage() {
     fire(0.1, { spread: 120, startVelocity: 45 })
   }, [])
 
-  const goNext = () => {
+  const goNext = async () => {
     if (index + 1 >= questions.length) {
       const total = scoreRef.current
       setFinalScore(total)
-      const { streak: s } = recordQuizFinished()
+      const { streak: s } = await recordQuizFinished(user?.id)
       setStreak(s)
       setFinished(true)
       if (total === questions.length) {

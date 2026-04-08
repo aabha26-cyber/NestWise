@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { ClerkProvider } from '@clerk/nextjs'
+import { nestWiseClerkAppearance } from '@/lib/clerkAppearance'
 
 function ThemeSync() {
   useEffect(() => {
@@ -14,7 +15,7 @@ function ThemeSync() {
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider appearance={nestWiseClerkAppearance}>
       <ThemeSync />
       {children}
     </ClerkProvider>

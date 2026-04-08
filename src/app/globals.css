@@ -3,57 +3,130 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-dark-border;
-  }
+  /* Do not set border-color on * — it breaks Clerk and other embedded UIs. Use .border-dark-border on components. */
 
   html.light {
     color-scheme: light;
   }
 
   html.light body {
-    background-color: #f5f5f5;
-    color: #171717;
+    background-color: #f8fafc;
+    color: #0f172a;
   }
 
   html.light .card {
     background-color: #fff;
-    border-color: #e5e5e5;
+    border-color: #e2e8f0;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   }
 
-  html.light .bg-dark-bg { background-color: #f5f5f5; }
-  html.light .bg-dark-surface { background-color: #fafafa; }
+  html.light .bg-dark-bg { background-color: #f8fafc; }
+  html.light .bg-dark-surface { background-color: #f1f5f9; }
   html.light .bg-dark-card { background-color: #fff; }
-  html.light .border-dark-border { border-color: #e5e5e5; }
-  html.light .text-dark-text-primary { color: #171717; }
-  html.light .text-dark-text-secondary { color: #525252; }
-  html.light .text-dark-text-muted { color: #737373; }
-  html.light .bg-dark-surface\/50 { background-color: rgba(250, 250, 250, 0.5); }
-  html.light .hover\:bg-dark-card\/50:hover { background-color: rgba(255, 255, 255, 0.8); }
-  html.light .bg-dark-accent-green { background-color: #059669; }
-  html.light .hover\:bg-dark-accent-green\/90:hover { background-color: #047857; }
-  html.light nav { border-color: #e5e5e5; background-color: rgba(250, 250, 250, 0.8); }
-  
+  html.light .border-dark-border { border-color: #e2e8f0; }
+  html.light .text-dark-text-primary { color: #0f172a; }
+  /* Stronger contrast than flat gray — slate tones match emerald accents */
+  html.light .text-dark-text-secondary { color: #475569; }
+  html.light .text-dark-text-muted { color: #64748b; }
+  html.light .bg-dark-accent-green { background-color: #58cc02; }
+  html.light .hover\:bg-dark-accent-green\/90:hover { background-color: #46a302; }
+  html.light .border-dark-accent-green-dark { border-color: #46a302; }
+  html.light nav { border-color: #e2e8f0; background-color: rgba(255, 255, 255, 0.85); }
+
+  /*
+   * Opacity utilities on dark.* still use #1f1f1f — in light mode that reads as dingy gray.
+   * Remap to slate neutrals + subtle brand green so hover and muted surfaces stay on-theme.
+   */
+  html.light .bg-dark-surface\/30 { background-color: rgba(15, 23, 42, 0.04); }
+  html.light .bg-dark-surface\/40 { background-color: rgba(15, 23, 42, 0.045); }
+  html.light .bg-dark-surface\/50 { background-color: rgba(241, 245, 249, 0.95); }
+  html.light .bg-dark-surface\/70 { background-color: #e8eef5; }
+  html.light .bg-dark-surface\/80 { background-color: #e2e8f0; }
+
+  html.light .bg-dark-card\/30 { background-color: rgba(5, 150, 105, 0.05); }
+  html.light .bg-dark-card\/50 { background-color: #f8fafc; }
+  html.light .bg-dark-card\/80 { background-color: #f1f5f9; }
+
+  html.light .hover\:bg-dark-card\/40:hover,
+  html.light .hover\:bg-dark-card\/50:hover {
+    background-color: rgba(5, 150, 105, 0.09);
+  }
+
+  html.light .border-dark-border\/50 { border-color: rgba(148, 163, 184, 0.45); }
+  html.light .border-dark-border\/60 { border-color: rgba(148, 163, 184, 0.55); }
+  html.light .border-dark-border\/70 { border-color: rgba(148, 163, 184, 0.65); }
+  html.light .border-dark-border\/80 { border-color: #cbd5e1; }
+  html.light .hover\:border-dark-border\/80:hover { border-color: #94a3b8; }
+
+  html.light .divide-dark-border > :not([hidden]) ~ :not([hidden]) {
+    border-color: #e2e8f0;
+  }
+
+  html.light .hover\:bg-dark-surface\/50:hover {
+    background-color: rgba(15, 23, 42, 0.05);
+  }
+
   body {
     @apply bg-dark-bg text-dark-text-primary;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero-animate-title,
+    .home-hero-animate-sub,
+    .home-feature-animate,
+    .home-cta-animate {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
   }
 }
 
 @layer components {
   .card {
-    @apply bg-dark-card rounded-xl p-6 border border-dark-border shadow-lg;
+    @apply bg-dark-card rounded-2xl p-6 border border-dark-border shadow-lg;
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.35);
   }
-  
+
   .btn-primary {
-    @apply bg-dark-accent-green hover:bg-dark-accent-green/90 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200;
+    @apply bg-dark-accent-green hover:brightness-110 active:translate-y-px text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 shadow-playful-sm border-b-4 border-dark-accent-green-dark;
   }
-  
+
   .btn-secondary {
-    @apply bg-dark-surface hover:bg-dark-card text-dark-text-primary font-medium px-6 py-3 rounded-lg border border-dark-border transition-all duration-200;
+    @apply bg-dark-surface hover:bg-dark-card text-dark-text-primary font-semibold px-6 py-3 rounded-xl border-2 border-dark-border transition-all duration-200;
+  }
+
+  /* Home / nav: playful hover with green glow */
+  .interactive-pop {
+    @apply transition-all duration-200 ease-out motion-safe:transition-transform;
+  }
+  .interactive-pop:hover {
+    transform: scale(1.06) translateY(-2px);
+    box-shadow:
+      0 0 0 1px rgba(88, 204, 2, 0.35),
+      0 0 32px rgba(88, 204, 2, 0.42),
+      0 10px 28px rgba(15, 23, 42, 0.45);
+  }
+  .interactive-pop:active {
+    transform: scale(1.03) translateY(0);
+  }
+  .interactive-pop:disabled:hover,
+  .interactive-pop:disabled:active {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Nav & menu links: pop + green glow on hover */
+  .nav-pop {
+    @apply transition-all duration-200 ease-out;
+  }
+  .nav-pop:hover {
+    transform: scale(1.05) translateY(-1px);
+    box-shadow:
+      0 0 0 1px rgba(88, 204, 2, 0.28),
+      0 0 22px rgba(88, 204, 2, 0.32);
+    background-color: rgba(88, 204, 2, 0.09);
   }
 }

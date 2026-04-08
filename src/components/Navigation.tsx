@@ -26,7 +26,7 @@ function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      className="p-2 rounded-lg border border-dark-border bg-dark-surface hover:bg-dark-card text-dark-text-secondary hover:text-dark-text-primary transition-colors"
+      className="p-2 rounded-lg border border-dark-border bg-dark-surface hover:bg-dark-card text-dark-text-secondary hover:text-dark-text-primary transition-all interactive-pop"
       title={light ? 'Switch to dark mode' : 'Switch to light mode'}
     >
       <NestWiseIcon name={light ? 'moon' : 'sun'} size={18} className="text-dark-text-secondary" />
@@ -44,6 +44,7 @@ const primaryNav = [
 ]
 
 const moreNav = [
+  { href: '/profile', label: 'Profile' },
   { href: '/learn/quiz', label: 'Daily quiz' },
   { href: '/goals', label: 'Goals' },
   { href: '/portfolio/report-card', label: 'Report card' },
@@ -80,7 +81,7 @@ export default function Navigation() {
               NestWise
             </span>
             <span className="text-xs sm:text-sm text-dark-text-secondary hidden sm:inline truncate max-w-[10rem] lg:max-w-none">
-              Money skills, clearly explained
+              Learn · Practice · Ask AI
             </span>
           </Link>
 
@@ -98,10 +99,10 @@ export default function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-2 sm:px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0 ${
+                  className={`px-3 sm:px-3.5 py-2 rounded-full text-sm font-bold transition-all duration-200 whitespace-nowrap shrink-0 inline-flex items-center justify-center ${
                     pathname === item.href
-                      ? 'bg-dark-card text-dark-accent-green'
-                      : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-card/50'
+                      ? 'bg-dark-card text-dark-accent-green shadow-playful-sm border-b-2 border-dark-accent-green-dark'
+                      : 'text-dark-text-secondary hover:text-dark-text-primary nav-pop'
                   }`}
                 >
                   {item.label}
@@ -117,10 +118,10 @@ export default function Navigation() {
                   }}
                   aria-expanded={moreOpen}
                   aria-haspopup="menu"
-                  className={`px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 ${
+                  className={`px-3 py-2 rounded-full text-sm font-bold transition-all duration-200 whitespace-nowrap flex items-center gap-0.5 ${
                     moreActive || moreOpen
-                      ? 'bg-dark-card text-dark-accent-green'
-                      : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-card/50'
+                      ? 'bg-dark-card text-dark-accent-green shadow-playful-sm border-b-2 border-dark-accent-green-dark'
+                      : 'text-dark-text-secondary hover:text-dark-text-primary nav-pop'
                   }`}
                 >
                   More
@@ -141,10 +142,10 @@ export default function Navigation() {
                         role="menuitem"
                         href={item.href}
                         onClick={() => setMoreOpen(false)}
-                        className={`block px-3 py-2.5 text-sm transition-colors ${
+                        className={`block px-3 py-2.5 text-sm font-semibold rounded-lg transition-all ${
                           pathname === item.href
                             ? 'text-dark-accent-green bg-dark-surface/80'
-                            : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-surface/50'
+                            : 'text-dark-text-secondary hover:text-dark-text-primary hover:bg-dark-surface/50 nav-pop'
                         }`}
                       >
                         {item.label}
@@ -166,10 +167,10 @@ export default function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block px-3 py-2.5 rounded-lg text-sm font-medium ${
+                className={`block px-3 py-2.5 rounded-xl text-sm font-bold transition-all ${
                   pathname === item.href
                     ? 'bg-dark-card text-dark-accent-green'
-                    : 'text-dark-text-secondary hover:bg-dark-card/50'
+                    : 'text-dark-text-secondary hover:bg-dark-card/50 nav-pop'
                 }`}
               >
                 {item.label}

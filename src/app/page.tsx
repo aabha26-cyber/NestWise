@@ -78,7 +78,7 @@ export default function Home() {
                   </p>
                 )}
               </div>
-              <Link href="/dashboard" className="btn-primary inline-flex items-center gap-2">
+              <Link href="/dashboard" className="btn-primary interactive-pop inline-flex items-center gap-2">
                 View dashboard
                 <NestWiseIcon name="arrow-right" size={18} className="opacity-90" />
               </Link>
@@ -90,17 +90,25 @@ export default function Home() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
         <div className="text-center">
-          <h1 className="text-5xl sm:text-6xl font-bold text-dark-text-primary mb-6">
-            Your calm place for money skills
+          <h1 className="home-hero-animate-title text-4xl sm:text-5xl lg:text-6xl font-extrabold text-dark-text-primary mb-6 opacity-0 animate-home-hero-title tracking-tight max-w-4xl mx-auto leading-[1.12]">
+            Learn money by doing—lessons, practice trades, and plain-English help
           </h1>
-          <p className="text-xl text-dark-text-secondary max-w-2xl mx-auto mb-12">
-            Budgeting, credit, taxes, insurance, investing — then practice in a simulator and ask AI. Educational, not advice.
+          <p className="home-hero-animate-sub text-lg sm:text-xl text-dark-text-secondary max-w-2xl mx-auto mb-12 opacity-0 animate-home-hero-sub leading-relaxed">
+            NestWise is here to nudge you into action: open a short course when you have five minutes, try the stock simulator
+            with fake money, or ask the AI to explain a term. Pick any path below—small steps add up.
+            <span className="mt-4 block text-sm sm:text-base text-dark-text-muted font-semibold">
+              Free to use · Educational only—not financial advice
+            </span>
           </p>
         </div>
 
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-6 mt-16 max-w-5xl mx-auto">
-          <Link href="/learn" className="card hover:border-dark-accent-green/50 transition-all duration-300 group hover:shadow-lg hover:shadow-dark-accent-green/5">
+          <Link
+            href="/learn"
+            style={{ animationDelay: '220ms' }}
+            className="home-feature-animate card interactive-pop opacity-0 animate-home-card-in hover:border-dark-accent-green/60 transition-all duration-300 group hover:shadow-[0_12px_40px_-8px_rgba(88,204,2,0.22)]"
+          >
             <div className="mb-5">
               <IconOrb name="book-open" size={24} />
             </div>
@@ -112,7 +120,11 @@ export default function Home() {
             </p>
           </Link>
 
-          <Link href="/portfolio" className="card hover:border-dark-accent-green/50 transition-all duration-300 group hover:shadow-lg hover:shadow-dark-accent-green/5">
+          <Link
+            href="/portfolio"
+            style={{ animationDelay: '360ms' }}
+            className="home-feature-animate card interactive-pop opacity-0 animate-home-card-in hover:border-dark-accent-green/60 transition-all duration-300 group hover:shadow-[0_12px_40px_-8px_rgba(88,204,2,0.22)]"
+          >
             <div className="mb-5">
               <IconOrb name="briefcase" size={24} />
             </div>
@@ -124,7 +136,11 @@ export default function Home() {
             </p>
           </Link>
 
-          <Link href="/chat" className="card hover:border-dark-accent-green/50 transition-all duration-300 group hover:shadow-lg hover:shadow-dark-accent-green/5">
+          <Link
+            href="/chat"
+            style={{ animationDelay: '500ms' }}
+            className="home-feature-animate card interactive-pop opacity-0 animate-home-card-in hover:border-dark-accent-green/60 transition-all duration-300 group hover:shadow-[0_12px_40px_-8px_rgba(88,204,2,0.22)]"
+          >
             <div className="mb-5">
               <IconOrb name="bot" size={24} />
             </div>
@@ -138,14 +154,14 @@ export default function Home() {
         </div>
 
         {/* CTA */}
-        <div className="text-center mt-16">
+        <div className="home-cta-animate text-center mt-16 opacity-0 animate-home-cta">
           {isSignedIn ? (
-            <Link href="/dashboard" className="btn-primary inline-block">
+            <Link href="/dashboard" className="btn-primary interactive-pop inline-block">
               Go to Dashboard
             </Link>
           ) : (
-            <Link href="/auth/signin" className="btn-primary inline-block">
-              Get Started
+            <Link href="/auth/signin" className="btn-primary interactive-pop inline-block">
+              Get started free
             </Link>
           )}
         </div>
@@ -213,12 +229,15 @@ export default function Home() {
                 className="flex-1 px-4 py-3 rounded-lg bg-dark-surface border border-dark-border text-dark-text-primary placeholder:text-dark-text-muted text-sm"
                 disabled={chatLoading}
               />
-              <button type="submit" disabled={chatLoading} className="btn-primary px-4 py-3 text-sm whitespace-nowrap">
+              <button type="submit" disabled={chatLoading} className="btn-primary interactive-pop px-4 py-3 text-sm whitespace-nowrap disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none">
                 {chatLoading ? '…' : 'Ask'}
               </button>
             </form>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-sm">
-              <Link href="/suggestions" className="inline-flex items-center gap-1.5 text-dark-accent-green hover:underline font-medium">
+              <Link
+                href="/suggestions"
+                className="inline-flex items-center gap-1.5 text-dark-accent-green hover:underline font-medium rounded-lg px-1 py-0.5 interactive-pop"
+              >
                 See top 3 investment options
                 <NestWiseIcon name="arrow-right" size={16} />
               </Link>
@@ -277,7 +296,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="pt-4">
-                <Link href="/portfolio" className="btn-primary inline-flex items-center gap-2">
+                <Link href="/portfolio" className="btn-primary interactive-pop inline-flex items-center gap-2">
                   <span>Open simulator</span>
                   <NestWiseIcon name="arrow-right" size={18} className="opacity-90" />
                 </Link>

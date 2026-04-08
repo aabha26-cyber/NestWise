@@ -80,13 +80,23 @@ export default function Chat() {
         </p>
       </div>
 
-      {/* Disclaimer Banner */}
-      <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6 flex gap-3">
-        <NestWiseIcon name="alert-triangle" size={22} className="text-yellow-400 shrink-0 mt-0.5" />
-        <p className="text-sm text-yellow-400">
-          <strong>Not financial advice. Educational use only.</strong> This AI provides general
-          educational information to help you learn about investing. Always consult with a qualified
-          financial advisor before making investment decisions.
+      {/* Disclaimer: surface + primary/secondary text (readable in light & dark); green accent only on border + icon */}
+      <div
+        className="rounded-xl p-4 mb-6 flex gap-3 bg-dark-surface border border-dark-border border-l-4 border-l-dark-accent-green shadow-sm"
+        role="note"
+      >
+        <NestWiseIcon
+          name="alert-triangle"
+          size={22}
+          className="text-dark-accent-green shrink-0 mt-0.5"
+          aria-hidden
+        />
+        <p className="text-sm leading-relaxed text-dark-text-secondary">
+          <strong className="text-dark-text-primary font-semibold">
+            Not financial advice. Educational use only.
+          </strong>{' '}
+          This AI provides general educational information to help you learn about investing. Always
+          consult with a qualified financial advisor before making investment decisions.
         </p>
       </div>
 

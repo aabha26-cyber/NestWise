@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { getWatchlist, addToWatchlist, removeFromWatchlist, type WatchlistItem } from '@/lib/watchlist'
 import { getMultipleStocks, type StockData } from '@/lib/stockApi'
-import { getWatchlistNote, setWatchlistNote } from '@/lib/watchlistNotes'
+import { getWatchlistNotes, setWatchlistNote } from '@/lib/watchlistNotes'
 import { unlockAchievement } from '@/lib/achievements'
 import Link from 'next/link'
 import { NestWiseIcon } from '@/components/NestWiseIcon'
@@ -18,6 +18,7 @@ export default function WatchlistPage() {
   const [loading, setLoading] = useState(true)
   const [watchlist, setWatchlist] = useState<WatchlistItemWithStock[]>([])
   const [processing, setProcessing] = useState<string | null>(null)
+  const [notes, setNotes] = useState<Record<string, string>>({})
 
   useEffect(() => {
     if (!userLoaded || !user) return
@@ -29,9 +30,12 @@ export default function WatchlistPage() {
       setLoading(true)
       if (!user?.id) return
 
-      const items = await getWatchlist(user.id)
-      
-      // Fetch current stock prices
+      const [items, loadedNotes] = await Promise.all([
+        getWatchlist(user.id),
+        getWatchlistNotes(user.id),
+      ])
+      setNotes(loadedNotes)
+
       const symbols = items.map(item => item.symbol)
       const stocks = await getMultipleStocks(symbols)
       const stockMap = new Map(stocks.map(s => [s.symbol, s]))
@@ -56,7 +60,7 @@ export default function WatchlistPage() {
       setProcessing(symbol)
       await addToWatchlist(user.id, symbol)
       const items = await getWatchlist(user.id)
-      if (items.length >= 5) unlockAchievement(user.id, 'watchlist-5')
+      if (items.length >= 5) await unlockAchievement(user.id, 'watchlist-5')
       await loadWatchlist()
     } catch (error) {
       console.error('Error adding to watchlist:', error)
@@ -167,8 +171,11 @@ export default function WatchlistPage() {
                     <input
                       type="text"
                       placeholder="Optional note..."
-                      defaultValue={getWatchlistNote(user.id, item.symbol)}
-                      onBlur={(e) => setWatchlistNote(user.id, item.symbol, e.target.value)}
+                      defaultValue={notes[item.symbol] ?? ''}
+                      onBlur={(e) => {
+                        setWatchlistNote(user.id, item.symbol, e.target.value)
+                        setNotes((prev) => ({ ...prev, [item.symbol]: e.target.value }))
+                      }}
                       className="w-full px-3 py-1.5 rounded-lg bg-dark-card border border-dark-border text-dark-text-primary text-sm placeholder:text-dark-text-muted"
                     />
                   </div>

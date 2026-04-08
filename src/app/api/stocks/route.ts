@@ -55,18 +55,9 @@ export async function GET(request: NextRequest) {
     if (symbols.length === 0) {
       return NextResponse.json({ stocks: [] })
     }
-    const results = await Promise.all(
-      symbols.map(async (sym) => {
-        const stock = await fetchYahooChart(sym)
-        if (!stock) return null
-        const desc = await fetchYahooDescription(sym)
-        if (desc) {
-          stock.description = desc.description
-          stock.whyInvest = desc.whyInvest
-        }
-        return stock
-      })
-    )
+    // Batch: chart only. quoteSummary per symbol was doubling latency and Yahoo calls
+    // (explore grid, search results, holdings refresh). Single-symbol GET still loads profile.
+    const results = await Promise.all(symbols.map((sym) => fetchYahooChart(sym)))
     const stocks = results.filter((s): s is NonNullable<typeof s> => s !== null)
     return NextResponse.json({ stocks })
   }
