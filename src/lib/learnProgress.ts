@@ -38,7 +38,21 @@ export async function getCompletedLessonIds(userId: string): Promise<string[]> {
         .eq('user_id', userId)
       if (error) throw error
       const remote = (data || []).map((r) => r.lesson_id)
-      return Array.from(new Set(local.concat(remote)))
+      const merged = Array.from(new Set(local.concat(remote)))
+      // Sync any local-only completions up to Supabase (covers device migration)
+      const onlyLocal = local.filter((id) => !remote.includes(id))
+      if (onlyLocal.length > 0) {
+        const rows = onlyLocal.map((lesson_id) => ({ user_id: userId, lesson_id }))
+        supabase
+          .from('user_learn_progress')
+          .upsert(rows, { onConflict: 'user_id,lesson_id' })
+          .then(({ error: upsertErr }) => {
+            if (upsertErr) console.error('Learn progress sync failed:', upsertErr)
+          })
+      }
+      // Also cache merged result locally so offline works
+      setLocalCompletedIds(userId, merged)
+      return merged
     } catch (e) {
       console.error('Supabase learn progress fetch failed, using localStorage:', e)
     }

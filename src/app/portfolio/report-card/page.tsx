@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
+import { useMounted } from '@/hooks/useMounted'
 import { getMultipleStocks, type StockData } from '@/lib/stockApi'
 import { getSimulatorState } from '@/lib/simulatorStorage'
 import { getSectorBreakdown, getPortfolioRiskScore } from '@/lib/sectors'
@@ -16,6 +17,7 @@ type Row = { symbol: string; value: number; gain: number; pct: number }
 
 export default function ReportCardPage() {
   const { user, isLoaded } = useUser()
+  const mounted = useMounted()
   const [loading, setLoading] = useState(true)
   const [totalValue, setTotalValue] = useState(0)
   const [totalCost, setTotalCost] = useState(0)
@@ -151,7 +153,7 @@ export default function ReportCardPage() {
     }
   }, [isLoaded, user?.id])
 
-  if (!isLoaded) {
+  if (!mounted || !isLoaded) {
     return <div className="max-w-4xl mx-auto px-4 py-12 text-dark-text-secondary text-center">Loading…</div>
   }
 

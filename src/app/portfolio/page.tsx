@@ -17,6 +17,8 @@ import {
   applyRecurringDepositIfDue,
   getRecurringDeposit,
   setRecurringDeposit,
+  isLocalMigrated,
+  markLocalMigrated,
 } from '@/lib/simulatorStorage'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
@@ -101,6 +103,7 @@ function PortfolioPageContent() {
       }
       applyRecurringDepositIfDue(user.id)
 
+      // --- Cloud path (Supabase) ---
       if (isSupabaseConfigured) {
         try {
           const res = await fetch('/api/portfolio', { credentials: 'include' })
@@ -122,17 +125,48 @@ function PortfolioPageContent() {
                 stock: stockDataMap.get(holding.symbol),
               }))
               setHoldings(holdingsWithStocks)
-              setLoading(false)
               return
             }
+            // No portfolio in Supabase yet — show start screen
+            setPortfolio(null)
+            setHoldings([])
+            setCashBalance(0)
+            setShowStartSimulator(true)
+            return
           }
         } catch {
-          /* fall through to local */
+          // Network error — fall through to local storage below
         }
       }
 
+      // --- Local storage fallback (no Supabase or network error) ---
       const localState = getSimulatorState(user.id)
       if (localState) {
+        // If Supabase is available, migrate local data up to the cloud automatically (once)
+        if (isSupabaseConfigured && !isLocalMigrated(user.id)) {
+          try {
+            const res = await fetch('/api/portfolio/migrate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                cashBalance: localState.cashBalance,
+                initialCash: localState.initialCash,
+                holdings: localState.holdings,
+                transactions: localState.transactions ?? [],
+              }),
+              credentials: 'include',
+            })
+            if (res.ok) {
+              markLocalMigrated(user.id)
+              // Reload from Supabase now that migration succeeded
+              await loadPortfolio()
+              return
+            }
+          } catch (migErr) {
+            console.error('Local→Supabase migration failed, continuing with local:', migErr)
+          }
+        }
+
         setPortfolio({ id: 'local' })
         setCashBalance(localState.cashBalance)
         setShowStartSimulator(false)
@@ -158,61 +192,24 @@ function PortfolioPageContent() {
           holdingsWithStocks.reduce((sum, h) => sum + (h.stock?.price ?? 0) * h.shares, 0)
         appendValueSnapshot(user.id, totalValue)
         setRecurringDepositConfig(getRecurringDeposit(user.id))
-        setLoading(false)
         return
       }
-      try {
-        const res = await fetch('/api/portfolio', { credentials: 'include' })
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}))
-          throw new Error(errData.error || 'Failed to fetch portfolio')
-        }
-        const { portfolio: portfolioData, holdings: holdingsData } = await res.json()
-        if (!portfolioData) {
-          setPortfolio(null)
-          setHoldings([])
-          setCashBalance(0)
-          setShowStartSimulator(true)
-          setError(null)
-          setLoading(false)
-          return
-        }
-        setShowStartSimulator(false)
-        setPortfolio(portfolioData)
-        setCashBalance(portfolioData.cash_balance)
-        const holdingsList = Array.isArray(holdingsData) ? holdingsData : []
-        const symbols = holdingsList.map((h: { symbol: string }) => h.symbol)
-        const stockDataMap = new Map<string, StockData>()
-        if (symbols.length > 0) {
-          const stocks = await getMultipleStocks(symbols)
-          stocks.forEach((stock) => stockDataMap.set(stock.symbol, stock))
-        }
-        const holdingsWithStocks: HoldingWithStock[] = holdingsList.map((holding: HoldingWithStock) => ({
-          ...holding,
-          stock: stockDataMap.get(holding.symbol),
-        }))
-        setHoldings(holdingsWithStocks)
-      } catch (apiErr: any) {
-        setPortfolio(null)
-        setHoldings([])
-        setCashBalance(0)
-        setShowStartSimulator(true)
-        setError(null)
-      }
+
+      // Nothing found anywhere — show start screen
+      setPortfolio(null)
+      setHoldings([])
+      setCashBalance(0)
+      setShowStartSimulator(true)
     } catch (err: any) {
       console.error('Error loading portfolio:', err)
-      if (user?.id && !portfolio) {
-        setShowStartSimulator(true)
-        setError(null)
-      } else {
-        setError(err.message || 'Failed to load portfolio')
-      }
+      setShowStartSimulator(true)
+      setError(null)
     } finally {
       setLoading(false)
     }
   }
 
-  const startSimulator = () => {
+  const startSimulator = async () => {
     const cash = customCash.trim() ? parseFloat(customCash) : initialCashChoice
     if (!Number.isFinite(cash) || cash <= 0) {
       setError('Enter a valid starting amount')
@@ -220,6 +217,33 @@ function PortfolioPageContent() {
     }
     if (!user?.id) return
     setError(null)
+
+    if (isSupabaseConfigured) {
+      // Save to Supabase so progress persists across devices
+      try {
+        const res = await fetch('/api/portfolio/init', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ initialCash: cash }),
+          credentials: 'include',
+        })
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}))
+          throw new Error(d.error || 'Failed to create portfolio')
+        }
+        const { portfolio: portfolioData } = await res.json()
+        setPortfolio(portfolioData)
+        setCashBalance(portfolioData.cash_balance)
+        setHoldings([])
+        setShowStartSimulator(false)
+        return
+      } catch (err: any) {
+        console.error('Failed to create Supabase portfolio, falling back to local:', err)
+        // Fall through to local if Supabase fails
+      }
+    }
+
+    // Local-only fallback
     createSimulator(user.id, cash)
     setPortfolio({ id: 'local' })
     setCashBalance(cash)

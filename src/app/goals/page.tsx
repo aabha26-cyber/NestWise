@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
+import { useMounted } from '@/hooks/useMounted'
 import { getMultipleStocks } from '@/lib/stockApi'
 import { getSimulatorState } from '@/lib/simulatorStorage'
 import {
@@ -23,6 +24,7 @@ const PRESETS = [
 
 export default function GoalsPage() {
   const { user, isLoaded } = useUser()
+  const mounted = useMounted()
   const [goal, setGoalState] = useState<InvestingGoal | null>(null)
   const [label, setLabel] = useState('')
   const [amount, setAmount] = useState('100')
@@ -87,7 +89,7 @@ export default function GoalsPage() {
     }))
   }, [goal])
 
-  if (!isLoaded) {
+  if (!mounted || !isLoaded) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 text-center text-dark-text-secondary">Loading…</div>
     )

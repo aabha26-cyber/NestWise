@@ -251,6 +251,20 @@ export function applyRecurringDepositIfDue(userId: string): boolean {
   return true
 }
 
+const MIGRATED_KEY_PREFIX = 'nestwise_migrated_'
+
+/** Returns true if this user's local data has already been migrated to Supabase. */
+export function isLocalMigrated(userId: string): boolean {
+  if (typeof window === 'undefined') return true
+  return localStorage.getItem(MIGRATED_KEY_PREFIX + userId) === '1'
+}
+
+/** Mark local data as migrated so we don't push it again. */
+export function markLocalMigrated(userId: string): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(MIGRATED_KEY_PREFIX + userId, '1')
+}
+
 /** Export holdings + transactions as CSV string. */
 export function exportSimulatorDataCSV(userId: string): string {
   const state = getSimulatorState(userId)

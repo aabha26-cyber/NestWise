@@ -191,11 +191,14 @@ function SimulatorPreview() {
 
 export default function Home() {
   const { isLoaded, isSignedIn, user } = useUser()
+  const [mounted, setMounted] = useState(false)
   const [portfolioValue, setPortfolioValue] = useState<number | null>(null)
   const [dailyChange, setDailyChange] = useState<number | null>(null)
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
   const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([])
+
+  useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
     if (!isSignedIn || !user?.id) return
@@ -259,8 +262,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Portfolio banner */}
-      {(!isLoaded || isSignedIn) && (
+      {/* Portfolio banner — only render client-side to avoid hydration mismatch */}
+      {mounted && (!isLoaded || isSignedIn) && (
         <section className="border-b border-dark-border bg-dark-card/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {isLoaded && isSignedIn && portfolioValue != null ? (
@@ -357,9 +360,9 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* CTA */}
+        {/* CTA — gated on mounted so server and first client render match */}
         <div className="text-center mt-16">
-          {isSignedIn ? (
+          {mounted && isSignedIn ? (
             <Link href="/dashboard" className="btn-primary interactive-pop inline-block">
               Go to Dashboard
             </Link>

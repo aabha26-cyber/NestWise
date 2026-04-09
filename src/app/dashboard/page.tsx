@@ -23,6 +23,8 @@ import {
   getSimulatorValueHistory,
   getSimulatorRealizedGains,
   applyRecurringDepositIfDue,
+  isLocalMigrated,
+  markLocalMigrated,
 } from '@/lib/simulatorStorage'
 import { getCompletedLessonIds } from '@/lib/learnProgress'
 import { getAllLessonIds, BASICS_LESSON_IDS } from '@/lib/courses'
@@ -207,6 +209,31 @@ export default function Dashboard() {
 
       const localState = getSimulatorState(user.id)
       if (localState) {
+        // Auto-migrate local data to Supabase once so it persists across devices
+        if (isSupabaseConfigured && !isLocalMigrated(user.id)) {
+          try {
+            const res = await fetch('/api/portfolio/migrate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                cashBalance: localState.cashBalance,
+                initialCash: localState.initialCash,
+                holdings: localState.holdings,
+                transactions: localState.transactions ?? [],
+              }),
+              credentials: 'include',
+            })
+            if (res.ok) {
+              markLocalMigrated(user.id)
+              // Reload dashboard from Supabase now
+              await loadDashboard()
+              return
+            }
+          } catch (migErr) {
+            console.error('Dashboard: local→Supabase migration failed:', migErr)
+          }
+        }
+
         setIsLocalSim(true)
         setCashBalance(localState.cashBalance)
         setInitialCash(localState.initialCash)

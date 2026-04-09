@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/nextjs'
+import { useMounted } from '@/hooks/useMounted'
 import Link from 'next/link'
 import { getStockData } from '@/lib/stockApi'
 import {
@@ -47,6 +48,7 @@ const OPTIONS: SuggestionOption[] = [
 
 export default function SuggestionsPage() {
   const { user, isLoaded } = useUser()
+  const mounted = useMounted()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [processing, setProcessing] = useState(false)
@@ -115,7 +117,7 @@ export default function SuggestionsPage() {
     }
   }
 
-  if (!isLoaded) {
+  if (!mounted || !isLoaded) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 text-center text-dark-text-secondary">
         Loading…

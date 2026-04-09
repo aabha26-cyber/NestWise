@@ -3,11 +3,15 @@
 import { useUser, SignInButton, SignOutButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useMounted } from '@/hooks/useMounted'
 
 export default function AuthButton() {
   const { isLoaded, isSignedIn, user } = useUser()
+  const mounted = useMounted()
 
-  if (!isLoaded) {
+  // Before mount: render the same skeleton the server renders (no auth state known yet).
+  // This ensures server HTML === first client render, preventing hydration mismatch.
+  if (!mounted || !isLoaded) {
     return (
       <div className="flex items-center space-x-2">
         <div className="w-8 h-8 bg-dark-surface rounded-full animate-pulse"></div>

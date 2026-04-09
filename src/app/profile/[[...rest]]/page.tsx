@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useUser, SignInButton, useClerk } from '@clerk/nextjs'
+import { useMounted } from '@/hooks/useMounted'
 import { NestWiseIcon } from '@/components/NestWiseIcon'
 import {
   getProfileBio,
@@ -19,6 +20,7 @@ import { isSupabaseConfigured } from '@/lib/supabase'
 export default function ProfilePage() {
   const { user, isLoaded } = useUser()
   const { openUserProfile } = useClerk()
+  const mounted = useMounted()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Bio + todos
@@ -179,7 +181,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (!isLoaded) {
+  if (!mounted || !isLoaded) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="card text-center py-12">
