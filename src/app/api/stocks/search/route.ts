@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     const data = await res.json()
     const quotes = (data.quotes || []).filter(
       (q: { symbol?: string; quoteType?: string }) =>
-        q.symbol && (q.quoteType === 'EQUITY' || q.quoteType === 'ETF' || q.quoteType === 'INDEX' || !q.quoteType)
+        q.symbol && (q.quoteType === 'EQUITY' || q.quoteType === 'ETF' || q.quoteType === 'INDEX' || q.quoteType === 'CRYPTOCURRENCY' || !q.quoteType)
     )
     return NextResponse.json({
       quotes: quotes.slice(0, limit).map((q: { symbol: string; shortname?: string; longname?: string; exchange?: string }) => ({

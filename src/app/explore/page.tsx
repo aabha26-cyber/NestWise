@@ -2,18 +2,18 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { searchStocks, getStockData, type StockData } from '@/lib/stockApi'
+import { searchStocks, getStockData, getMultipleStocks, CRYPTO_SYMBOLS, ETF_SYMBOLS, STOCK_ONLY_SYMBOLS, type StockData } from '@/lib/stockApi'
 import { useUser } from '@clerk/nextjs'
 import { addToWatchlist, isInWatchlist } from '@/lib/watchlist'
 import StockDeepDive from '@/components/StockDeepDive'
 import { NestWiseIcon } from '@/components/NestWiseIcon'
+import CoinLoader from '@/components/CoinLoader'
 
 function ExploreLoading() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="card text-center py-12">
-        <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-dark-text-secondary">Loading explorer…</p>
+        <CoinLoader text="Loading explorer…" />
       </div>
     </div>
   )
@@ -25,6 +25,8 @@ function ExploreContent() {
   const searchParams = useSearchParams()
   const symbolFromUrl = searchParams.get('symbol')?.trim() ?? ''
 
+  type Category = 'all' | 'stocks' | 'etfs' | 'crypto'
+  const [category, setCategory] = useState<Category>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedStock, setSelectedStock] = useState<StockData | null>(null)
   const [stocks, setStocks] = useState<StockData[]>([])
@@ -36,7 +38,7 @@ function ExploreContent() {
   useEffect(() => {
     const t = setTimeout(() => loadStocks(), searchQuery.trim() ? 350 : 0)
     return () => clearTimeout(t)
-  }, [searchQuery])
+  }, [searchQuery, category])
 
   useEffect(() => {
     if (user && stocks.length > 0) {
@@ -87,8 +89,22 @@ function ExploreContent() {
   const loadStocks = async () => {
     try {
       setLoading(true)
-      const results = await searchStocks(searchQuery)
-      setStocks(results)
+      if (searchQuery.trim()) {
+        const results = await searchStocks(searchQuery)
+        setStocks(results)
+      } else if (category === 'crypto') {
+        const results = await getMultipleStocks(CRYPTO_SYMBOLS)
+        setStocks(results)
+      } else if (category === 'etfs') {
+        const results = await getMultipleStocks(ETF_SYMBOLS)
+        setStocks(results)
+      } else if (category === 'stocks') {
+        const results = await getMultipleStocks(STOCK_ONLY_SYMBOLS.slice(0, 24))
+        setStocks(results)
+      } else {
+        const results = await searchStocks('')
+        setStocks(results)
+      }
     } catch (error: unknown) {
       console.error('Error loading stocks:', error)
     } finally {
@@ -167,16 +183,39 @@ function ExploreContent() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-dark-text-primary mb-2">Stock Explorer</h1>
-      <p className="text-dark-text-secondary mb-8">
-        Search stocks worldwide by company name or symbol. Click any stock for price, AI overview, and more.
+      <h1 className="text-3xl font-bold text-dark-text-primary mb-2">Explore</h1>
+      <p className="text-dark-text-secondary mb-6">
+        Browse stocks, ETFs, and crypto. Click any asset for price, AI overview, and more.
       </p>
+
+      {/* Category tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {([
+          { key: 'all', label: 'All' },
+          { key: 'stocks', label: 'Stocks' },
+          { key: 'etfs', label: 'ETFs' },
+          { key: 'crypto', label: 'Crypto' },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => { setCategory(tab.key); setSearchQuery('') }}
+            className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-200 ${
+              category === tab.key
+                ? 'bg-dark-accent-green text-white shadow-playful-sm'
+                : 'bg-dark-surface text-dark-text-secondary border border-dark-border hover:border-dark-accent-green/40 hover:text-dark-text-primary'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
       {/* Search Bar */}
       <div className="mb-8">
         <input
           type="text"
-          placeholder="Search by company name or symbol (e.g., Apple, AAPL, Tesla, Samsung, LVMH)"
+          placeholder="Search by name or symbol (e.g., Apple, AAPL, Bitcoin, BTC-USD)"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full max-w-2xl mx-auto block bg-dark-surface border border-dark-border rounded-lg px-6 py-4 text-dark-text-primary placeholder-dark-text-muted focus:outline-none focus:ring-2 focus:ring-dark-accent-green focus:border-transparent"
@@ -185,8 +224,7 @@ function ExploreContent() {
 
       {loading && !selectedStock && (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-text-secondary">Loading stocks...</p>
+          <CoinLoader text="Loading stocks..." />
         </div>
       )}
 

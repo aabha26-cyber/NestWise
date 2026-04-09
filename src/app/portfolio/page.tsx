@@ -25,6 +25,7 @@ import { useSearchParams } from 'next/navigation'
 import { getSectorBreakdown, getPortfolioRiskScore, getSector } from '@/lib/sectors'
 import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import CoinLoader from '@/components/CoinLoader'
 
 interface HoldingWithStock extends Holding {
   stock?: StockData
@@ -370,8 +371,7 @@ function PortfolioPageContent() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card text-center py-12">
-          <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-text-secondary">Loading...</p>
+          <CoinLoader text="Loading..." />
         </div>
       </div>
     )
@@ -395,8 +395,7 @@ function PortfolioPageContent() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card text-center py-12">
-          <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-text-secondary">Loading portfolio...</p>
+          <CoinLoader text="Loading portfolio..." />
         </div>
       </div>
     )
@@ -910,8 +909,7 @@ function PortfolioLoading() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="card text-center py-12">
-        <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-dark-text-secondary">Loading...</p>
+        <CoinLoader text="Loading..." />
       </div>
     </div>
   )

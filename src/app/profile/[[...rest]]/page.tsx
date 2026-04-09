@@ -16,6 +16,7 @@ import {
   type UserTodo,
 } from '@/lib/userProfile'
 import { isSupabaseConfigured } from '@/lib/supabase'
+import CoinLoader from '@/components/CoinLoader'
 
 export default function ProfilePage() {
   const { user, isLoaded } = useUser()
@@ -185,8 +186,7 @@ export default function ProfilePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="card text-center py-12">
-          <div className="w-10 h-10 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-dark-text-secondary font-semibold">Loading profile…</p>
+          <CoinLoader text="Loading profile…" />
         </div>
       </div>
     )
@@ -231,17 +231,17 @@ export default function ProfilePage() {
         <div className="space-y-6">
 
           {/* Profile picture */}
-          <div className="card border-2 border-dark-accent-blue/25 bg-gradient-to-br from-dark-card to-dark-surface/80">
-            <p className="text-xs font-bold uppercase tracking-wide text-dark-accent-blue mb-4">Profile picture</p>
+          <div className="card border-2 border-dark-accent-green/25">
+            <p className="text-xs font-bold uppercase tracking-wide text-dark-accent-green mb-4">Profile picture</p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
               <div className="relative shrink-0 mx-auto sm:mx-0">
                 <div className="absolute inset-0 rounded-full bg-dark-accent-green/20 blur-xl scale-110" aria-hidden />
                 {user.imageUrl ? (
-                  <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-dark-accent-green shadow-playful ring-4 ring-dark-accent-blue/20">
+                  <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-dark-accent-green shadow-playful ring-4 ring-dark-accent-green/20">
                     <Image src={user.imageUrl} alt="" width={112} height={112} className="object-cover" unoptimized />
                   </div>
                 ) : (
-                  <div className="relative w-28 h-28 rounded-full bg-dark-surface border-4 border-dashed border-dark-border flex items-center justify-center text-3xl font-extrabold text-dark-text-primary ring-4 ring-dark-accent-blue/15">
+                  <div className="relative w-28 h-28 rounded-full bg-dark-surface border-4 border-dashed border-dark-border flex items-center justify-center text-3xl font-extrabold text-dark-text-primary ring-4 ring-dark-accent-green/15">
                     {initials}
                   </div>
                 )}

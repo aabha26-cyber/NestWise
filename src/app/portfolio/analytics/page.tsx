@@ -19,6 +19,7 @@ import {
   Filler,
 } from 'chart.js'
 import { format } from 'date-fns'
+import CoinLoader from '@/components/CoinLoader'
 
 ChartJS.register(
   CategoryScale,
@@ -130,8 +131,7 @@ export default function AnalyticsPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card text-center py-12">
-          <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-text-secondary">Loading analytics...</p>
+          <CoinLoader text="Loading analytics..." />
         </div>
       </div>
     )

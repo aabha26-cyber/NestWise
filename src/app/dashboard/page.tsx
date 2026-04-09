@@ -38,6 +38,7 @@ import { getSectorBreakdown, getPortfolioRiskScore } from '@/lib/sectors'
 import { format } from 'date-fns'
 import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
 import { getChartTheme } from '@/lib/chartTheme'
+import CoinLoader from '@/components/CoinLoader'
 
 ChartJS.register(
   CategoryScale,
@@ -496,8 +497,7 @@ export default function Dashboard() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card text-center py-12">
-          <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-text-secondary">Loading...</p>
+          <CoinLoader text="Loading..." />
         </div>
       </div>
     )
@@ -521,8 +521,7 @@ export default function Dashboard() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card text-center py-12">
-          <div className="w-8 h-8 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-dark-text-secondary">Loading dashboard...</p>
+          <CoinLoader text="Loading dashboard..." />
         </div>
       </div>
     )

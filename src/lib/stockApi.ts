@@ -123,7 +123,20 @@ const POPULAR_STOCKS = [
   'PYPL', 'ADBE', 'NKE', 'CRM', 'INTC', 'AMD', 'AVGO', 'ORCL', 'CSCO', 'PEP',
   'COST', 'MCD', 'ABBV', 'TMO', 'ABT', 'DHR', 'NEE', 'LIN', 'PM', 'BMY',
   'SPY', 'QQQ', 'VTI', 'VOO', 'IWM',
+  'BTC-USD', 'ETH-USD', 'SOL-USD', 'DOGE-USD', 'ADA-USD',
+  'XRP-USD', 'AVAX-USD', 'DOT-USD', 'MATIC-USD', 'LINK-USD',
 ]
+
+export const CRYPTO_SYMBOLS = [
+  'BTC-USD', 'ETH-USD', 'SOL-USD', 'DOGE-USD', 'ADA-USD',
+  'XRP-USD', 'AVAX-USD', 'DOT-USD', 'MATIC-USD', 'LINK-USD',
+]
+
+export const ETF_SYMBOLS = ['SPY', 'QQQ', 'VTI', 'VOO', 'IWM']
+
+export const STOCK_ONLY_SYMBOLS = POPULAR_STOCKS.filter(
+  (s) => !CRYPTO_SYMBOLS.includes(s) && !ETF_SYMBOLS.includes(s)
+)
 
 export async function searchStocks(query: string): Promise<StockData[]> {
   if (!query.trim()) {

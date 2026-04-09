@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { ClerkProvider } from '@clerk/nextjs'
 import { nestWiseClerkAppearance } from '@/lib/clerkAppearance'
 import { MoneyRainGate } from '@/components/MoneyRain'
+import SplashScreen from '@/components/SplashScreen'
 
 function ThemeSync() {
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider appearance={nestWiseClerkAppearance}>
       <ThemeSync />
+      <SplashScreen />
       <MoneyRainGate />
       {children}
     </ClerkProvider>

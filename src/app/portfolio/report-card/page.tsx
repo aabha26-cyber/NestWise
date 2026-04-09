@@ -10,6 +10,7 @@ import { getSectorBreakdown, getPortfolioRiskScore } from '@/lib/sectors'
 import { computeLetterGrade, coachMessage } from '@/lib/reportCardGrade'
 import { Pie } from 'react-chartjs-2'
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from 'chart.js'
+import CoinLoader from '@/components/CoinLoader'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -171,8 +172,7 @@ export default function ReportCardPage() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-        <div className="w-10 h-10 border-4 border-dark-accent-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-dark-text-secondary">Building your report card…</p>
+        <CoinLoader text="Building your report card…" />
       </div>
     )
   }

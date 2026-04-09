@@ -1057,6 +1057,235 @@ export const courses: Course[] = [
       },
     ],
   },
+
+  // ─── Crypto ────────────────────────────────────────────────────────────────
+  {
+    id: 'crypto-basics',
+    title: 'Crypto from zero',
+    description: 'Blockchain, Bitcoin, altcoins, and how to think about crypto as an investment — no jargon.',
+    icon: 'bitcoin',
+    modules: [
+      {
+        title: 'What is crypto?',
+        lessons: [
+          {
+            id: 'crypto-blockchain',
+            title: 'What even is a blockchain?',
+            icon: 'link',
+            readTime: 3,
+            sections: [
+              {
+                type: 'hook',
+                body: 'Imagine a Google Doc that the entire world can read but nobody can delete or sneak-edit. Every change gets a timestamp and a signature. That is roughly what a blockchain does — but for money.',
+              },
+              {
+                type: 'concept',
+                body: 'A blockchain is a digital ledger (fancy word for notebook) shared across thousands of computers. When someone sends crypto, the transaction is bundled into a "block" and added to a chain of previous blocks — hence the name. Because every computer keeps a copy, there is no single company or bank in charge. If one copy gets tampered with, the thousands of other copies outvote it.',
+              },
+              {
+                type: 'example',
+                heading: 'Sending $20 to a friend',
+                body: 'Normally: you open Venmo → Venmo asks your bank → bank verifies → Venmo updates its private database. With crypto: you press send → the network of computers verifies you have enough coins → the transaction is added to the blockchain. No bank, no Venmo, no private database.',
+              },
+              {
+                type: 'tip',
+                heading: 'Why does this matter?',
+                body: 'The blockchain lets strangers trust each other without a middleman. That is the core innovation. Whether it changes the world or stays niche is debated, but understanding the concept unlocks everything else in crypto.',
+              },
+              {
+                type: 'takeaways',
+                body: '• A blockchain is a shared, tamper-resistant record of transactions\n• No single company controls it — thousands of computers each keep a copy\n• It removes the need for a trusted middleman like a bank\n• "Decentralized" just means no one entity is in charge',
+              },
+            ],
+            check: {
+              question: 'Why is it hard for someone to fake a transaction on a blockchain?',
+              reveal: 'Because thousands of computers each hold a copy of the ledger. To fake a transaction you would need to change more than half of all copies at the same time — practically impossible on a large network like Bitcoin or Ethereum.',
+            },
+          },
+          {
+            id: 'crypto-btc-eth-alts',
+            title: 'Bitcoin, Ethereum & altcoins',
+            icon: 'coins',
+            readTime: 4,
+            sections: [
+              {
+                type: 'hook',
+                body: 'There are over 20,000 cryptocurrencies. That sounds overwhelming, but you really only need to understand a handful to make sense of the space.',
+              },
+              {
+                type: 'concept',
+                body: 'Bitcoin (BTC) was the first cryptocurrency, launched in 2009 by the pseudonymous Satoshi Nakamoto. Its purpose is simple: digital money that nobody controls. There will only ever be 21 million bitcoins — that hard cap is why some people call it "digital gold." Ethereum (ETH) came in 2015 and added a twist: programmable money. Developers can build apps (called "smart contracts") on top of Ethereum — think automatic vending machines that run on code instead of quarters. Everything else is lumped under "altcoins": Solana (fast and cheap transactions), Dogecoin (started as a joke, became a meme community), Cardano, XRP, and thousands more.',
+              },
+              {
+                type: 'example',
+                heading: 'Quick comparison',
+                body: 'Bitcoin is like gold — scarce, a store of value, slow to move. Ethereum is like a programmable platform — apps and tokens are built on it. Solana is like a faster, cheaper alternative platform competing with Ethereum. Dogecoin is like a community coin — value driven mostly by popularity and memes.',
+              },
+              {
+                type: 'warning',
+                heading: 'Hype coins and rug pulls',
+                body: 'Many altcoins are launched purely to make their creators rich. Red flags: anonymous team, promises of guaranteed returns, sudden celebrity endorsements, and coins named after memes you saw yesterday. If it sounds too good to be true, it almost always is. Stick to well-known projects when learning.',
+              },
+              {
+                type: 'takeaways',
+                body: '• Bitcoin = digital gold, capped at 21 million coins\n• Ethereum = programmable blockchain for apps and tokens\n• Altcoins = everything else, ranging from serious projects to outright scams\n• Always research before buying — most altcoins fail within a few years',
+              },
+            ],
+            check: {
+              question: 'What makes Ethereum different from Bitcoin in one sentence?',
+              reveal: 'Ethereum lets developers build apps and smart contracts on its blockchain, while Bitcoin is primarily designed to be a decentralized digital currency and store of value.',
+            },
+          },
+          {
+            id: 'crypto-wallets-keys',
+            title: 'Wallets, exchanges & keys',
+            icon: 'key',
+            readTime: 3,
+            sections: [
+              {
+                type: 'hook',
+                body: '"Not your keys, not your coins." You will hear this phrase a lot. It means if you do not control the password to your crypto, someone else does — and they could lose it.',
+              },
+              {
+                type: 'concept',
+                body: 'To buy crypto you typically use an exchange like Coinbase, Kraken, or Binance — similar to a brokerage for stocks. The exchange holds your coins for you (called "custodial" storage). But you can also move coins to your own wallet — a piece of software (or hardware device) that stores your private key. The private key is like the master password to your funds. Lose it and your coins are gone forever; nobody can reset it for you.',
+              },
+              {
+                type: 'example',
+                heading: 'Exchange vs. self-custody',
+                body: 'Exchange (Coinbase): Like keeping cash in a bank — convenient, but the bank could freeze your account or get hacked. Self-custody (Ledger, MetaMask): Like a home safe — you hold the key, but if you lose it, nobody can open it for you.',
+              },
+              {
+                type: 'tip',
+                heading: 'Starting out? Keep it simple',
+                body: 'For beginners, a reputable exchange with two-factor authentication is fine. You can learn about self-custody wallets later. The NestWise simulator lets you practice buying crypto without worrying about any of this — try it!',
+              },
+              {
+                type: 'action',
+                heading: 'Try it in the simulator',
+                body: 'Head to the Portfolio page and search for BTC-USD or ETH-USD. Buy a small amount with your virtual cash. Watch how the price moves over the next few days — this is your first crypto trade (with zero risk).',
+              },
+              {
+                type: 'takeaways',
+                body: '• Exchanges (Coinbase, Kraken) let you buy crypto easily — they hold your coins\n• Self-custody means you hold the private key yourself — more control, more responsibility\n• Never share your private key or seed phrase with anyone\n• Start with a reputable exchange and learn self-custody later',
+              },
+            ],
+            check: {
+              question: 'Your friend says "I wrote my seed phrase on a sticky note at work." Why is that risky?',
+              reveal: 'A seed phrase is the master key to all your crypto. Anyone who reads that sticky note can steal every coin in the wallet — and there is no customer support to reverse it. Seed phrases should be stored securely offline, never left in public.',
+            },
+          },
+        ],
+      },
+      {
+        title: 'Crypto as an investment',
+        lessons: [
+          {
+            id: 'crypto-volatility',
+            title: 'Why crypto is so volatile',
+            icon: 'zap',
+            readTime: 3,
+            sections: [
+              {
+                type: 'hook',
+                body: 'In November 2021 Bitcoin hit $69,000. By June 2022 it was below $18,000 — a 74% drop. Then by early 2024 it passed $70,000 again. Welcome to crypto volatility.',
+              },
+              {
+                type: 'concept',
+                body: 'Crypto prices swing wildly for several reasons. First, the market is relatively small compared to stocks — a big buy or sell order moves the price more. Second, crypto trades 24/7/365 with no circuit breakers (stock exchanges pause trading during extreme drops; crypto does not). Third, prices are heavily driven by sentiment, social media hype, and news cycles rather than quarterly earnings reports. Finally, events like Bitcoin\'s "halving" (when the supply of new coins is cut in half every four years) create supply shocks that amplify price swings.',
+              },
+              {
+                type: 'example',
+                heading: 'The emotional rollercoaster',
+                body: 'Imagine you bought $1,000 of Bitcoin at $60,000. A month later it drops to $35,000 — your $1,000 is now $583. Your stomach drops. Three months later it rebounds to $55,000 — your balance is $916. Still down, but recovering. Can you handle that? Most people cannot, and they sell at the bottom.',
+              },
+              {
+                type: 'warning',
+                heading: 'FOMO is the enemy',
+                body: 'Fear Of Missing Out makes people buy at the top because "everyone is making money." Then panic makes them sell at the bottom. This buy-high-sell-low cycle is responsible for most losses in crypto. Having a plan before you buy is the single best defense.',
+              },
+              {
+                type: 'takeaways',
+                body: '• Crypto is far more volatile than stocks — 50%+ drops happen regularly\n• 24/7 trading, small market size, and sentiment-driven pricing cause wild swings\n• Bitcoin\'s halving cycle (every ~4 years) historically triggers major price movements\n• FOMO and panic selling are the top reasons beginners lose money',
+              },
+            ],
+            check: {
+              question: 'Bitcoin drops 40% in a week. What is the worst thing most beginners do, and why?',
+              reveal: 'They panic-sell at the bottom, locking in the loss. The price often recovers over months or years, but the person who sold is no longer invested. Having a plan ("I will hold for at least 2 years" or "I will only invest what I can afford to lose") prevents emotional decisions.',
+            },
+          },
+          {
+            id: 'crypto-evaluate',
+            title: 'How to evaluate a crypto project',
+            icon: 'search',
+            readTime: 4,
+            sections: [
+              {
+                type: 'hook',
+                body: 'Picking a crypto is not like picking a stock. There are no earnings reports, no P/E ratios, no dividends. So what do you look at?',
+              },
+              {
+                type: 'concept',
+                body: 'Start with the basics: What problem does the project solve? Who is the team? Is the code open-source? Then look at market cap (total value of all coins — bigger is generally safer). Check tokenomics: how many coins exist, how many will ever exist, and who holds a large share. If 50% of coins are held by the founding team with no lockup period, they could dump and crash the price. Finally, look at the community and developer activity — active GitHub repos and growing user numbers are positive signs.',
+              },
+              {
+                type: 'example',
+                heading: 'Evaluating like a detective',
+                body: 'Ethereum: open-source, thousands of developers, real apps built on it, clear roadmap, large market cap. Versus "MoonRocket Coin": anonymous team, no product, whitepaper full of buzzwords, 80% of coins held by insiders. One is a serious project, the other is almost certainly a scam.',
+              },
+              {
+                type: 'tip',
+                heading: 'Red flags to watch for',
+                body: 'Anonymous or fake team members. Promises of "guaranteed 100x returns." Aggressive social media shilling. No working product. Copy-pasted whitepaper. If you see these, walk away. Legitimate projects do not need to promise the moon.',
+              },
+              {
+                type: 'takeaways',
+                body: '• Check the problem it solves, team, open-source code, and community activity\n• Market cap matters — larger projects are generally less risky\n• Tokenomics (supply, distribution, lockups) reveal who really benefits\n• If it promises guaranteed returns or has an anonymous team, it is almost certainly a scam',
+              },
+            ],
+            check: {
+              question: 'A new coin has no working product, an anonymous team, and promises "10x in 30 days." Should you invest?',
+              reveal: 'Absolutely not. No working product means there is nothing backing the token\'s value. An anonymous team means nobody is accountable. Guaranteed return promises are the single biggest red flag in crypto. This has all the hallmarks of a scam or rug pull.',
+            },
+          },
+          {
+            id: 'crypto-position-safely',
+            title: 'Building a crypto position safely',
+            icon: 'shield',
+            readTime: 3,
+            sections: [
+              {
+                type: 'hook',
+                body: 'The golden rule of crypto investing: never put in more than you can afford to lose completely. Seriously. Treat it like money you set on fire — if it comes back, great.',
+              },
+              {
+                type: 'concept',
+                body: 'Dollar-cost averaging (DCA) is the safest way to enter crypto. Instead of buying $1,000 at once, you buy $100 every week for 10 weeks. If the price drops, your next purchase is cheaper — you automatically buy more when it is on sale. Position sizing is equally important: most financial educators suggest keeping crypto at 5% or less of your total portfolio. That way, even a total wipeout does not ruin you. Diversification within crypto helps too: holding Bitcoin and Ethereum is much safer than putting everything into one altcoin.',
+              },
+              {
+                type: 'example',
+                heading: 'DCA in action',
+                body: 'You have $500 to invest in Bitcoin. Week 1: BTC is $60,000 — you buy $100. Week 2: BTC drops to $50,000 — you buy $100 (getting more BTC). Week 3: BTC is $55,000 — you buy $100. Your average price is $55,000, not the $60,000 you would have paid going all-in on day one.',
+              },
+              {
+                type: 'action',
+                heading: 'Try this in the simulator',
+                body: 'Open your NestWise portfolio. Allocate 5% of your virtual cash to crypto: split it between BTC-USD and ETH-USD. Check back in a week and see how the volatility feels compared to your stock holdings. This is the best way to learn without risk.',
+              },
+              {
+                type: 'takeaways',
+                body: '• Never invest more than you can afford to lose — crypto can go to zero\n• Dollar-cost averaging reduces the risk of buying at the top\n• Keep crypto at 5% or less of your total portfolio\n• Diversify within crypto — BTC + ETH is safer than one random altcoin',
+              },
+            ],
+            check: {
+              question: 'Your friend goes all-in on a single altcoin with their entire savings. What are two things wrong with this approach?',
+              reveal: 'First, they are investing more than they can afford to lose — using entire savings on any single volatile asset is dangerous. Second, they have zero diversification — one altcoin failing (which most do) would wipe out everything. A safer approach: invest a small percentage, spread across BTC/ETH, and use dollar-cost averaging.',
+            },
+          },
+        ],
+      },
+    ],
+  },
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────

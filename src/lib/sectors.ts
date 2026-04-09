@@ -51,6 +51,21 @@ export const SYMBOL_SECTOR: Record<string, string> = {
   BND: 'ETF',
   VEA: 'ETF',
   VWO: 'ETF',
+  'BTC-USD': 'Crypto',
+  'ETH-USD': 'Crypto',
+  'SOL-USD': 'Crypto',
+  'DOGE-USD': 'Crypto',
+  'ADA-USD': 'Crypto',
+  'XRP-USD': 'Crypto',
+  'AVAX-USD': 'Crypto',
+  'DOT-USD': 'Crypto',
+  'MATIC-USD': 'Crypto',
+  'LINK-USD': 'Crypto',
+  'SHIB-USD': 'Crypto',
+  'LTC-USD': 'Crypto',
+  'UNI-USD': 'Crypto',
+  'ATOM-USD': 'Crypto',
+  'BCH-USD': 'Crypto',
 }
 
 export function getSector(symbol: string): string {
