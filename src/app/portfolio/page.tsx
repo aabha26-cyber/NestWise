@@ -128,12 +128,7 @@ function PortfolioPageContent() {
               setHoldings(holdingsWithStocks)
               return
             }
-            // No portfolio in Supabase yet — show start screen
-            setPortfolio(null)
-            setHoldings([])
-            setCashBalance(0)
-            setShowStartSimulator(true)
-            return
+            // No portfolio in Supabase yet — fall through to check localStorage before showing start screen
           }
         } catch {
           // Network error — fall through to local storage below
@@ -203,8 +198,7 @@ function PortfolioPageContent() {
       setShowStartSimulator(true)
     } catch (err: any) {
       console.error('Error loading portfolio:', err)
-      setShowStartSimulator(true)
-      setError(null)
+      setError('Failed to load portfolio. Please refresh.')
     } finally {
       setLoading(false)
     }
