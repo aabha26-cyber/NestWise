@@ -12,24 +12,20 @@ function ThemeToggle() {
     setLight(document.documentElement.classList.contains('light'))
   }, [])
   const toggle = () => {
-    const next = !document.documentElement.classList.contains('light')
-    if (next) {
-      document.documentElement.classList.add('light')
-      localStorage.setItem('nestwise_theme', 'light')
-    } else {
-      document.documentElement.classList.remove('light')
-      localStorage.setItem('nestwise_theme', 'dark')
-    }
+    const next = !light
+    document.documentElement.classList.toggle('light', next)
+    document.documentElement.classList.toggle('dark', !next)
+    localStorage.setItem('nestwise_theme', next ? 'light' : 'dark')
     setLight(next)
   }
   return (
     <button
       type="button"
       onClick={toggle}
-      className="p-2 rounded-lg border border-dark-border bg-dark-surface hover:bg-dark-card text-dark-text-secondary hover:text-dark-text-primary transition-all interactive-pop"
+      className="p-2 rounded-lg border border-dark-border bg-dark-surface hover:bg-dark-card text-dark-text-secondary hover:text-dark-text-primary transition-all nav-pop"
       title={light ? 'Switch to dark mode' : 'Switch to light mode'}
     >
-      <NestWiseIcon name={light ? 'moon' : 'sun'} size={18} className="text-dark-text-secondary" />
+      <NestWiseIcon name={light ? 'moon' : 'sun'} size={18} />
     </button>
   )
 }
@@ -126,7 +122,7 @@ export default function Navigation() {
                 >
                   More
                   <NestWiseIcon
-                    name={moreOpen ? 'chevron-down' : 'chevron-down'}
+                    name="chevron-down"
                     size={14}
                     className={`opacity-70 transition-transform ${moreOpen ? 'rotate-180' : ''}`}
                   />

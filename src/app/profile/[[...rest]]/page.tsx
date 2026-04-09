@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useUser, SignInButton } from '@clerk/nextjs'
+import { useUser, SignInButton, useClerk } from '@clerk/nextjs'
 import { NestWiseIcon } from '@/components/NestWiseIcon'
 import {
   getProfileBio,
@@ -17,21 +16,12 @@ import {
 } from '@/lib/userProfile'
 import { isSupabaseConfigured } from '@/lib/supabase'
 
-const UserProfile = dynamic(
-  () => import('@clerk/nextjs').then((mod) => mod.UserProfile),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="rounded-2xl border-2 border-dark-border bg-dark-surface p-8 animate-pulse min-h-[280px] flex items-center justify-center">
-        <p className="text-dark-text-muted text-sm font-semibold">Loading account settings…</p>
-      </div>
-    ),
-  }
-)
-
 export default function ProfilePage() {
   const { user, isLoaded } = useUser()
+  const { openUserProfile } = useClerk()
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Bio + todos
   const [bio, setBio] = useState('')
   const [bioDraft, setBioDraft] = useState('')
   const [bioSaving, setBioSaving] = useState(false)
@@ -39,8 +29,31 @@ export default function ProfilePage() {
   const [todos, setTodos] = useState<UserTodo[]>([])
   const [todoInput, setTodoInput] = useState('')
   const [todosLoading, setTodosLoading] = useState(true)
+
+  // Photo
   const [photoBusy, setPhotoBusy] = useState(false)
   const [photoErr, setPhotoErr] = useState<string | null>(null)
+
+  // Display name
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [nameSaving, setNameSaving] = useState(false)
+  const [nameMsg, setNameMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+
+  // Password
+  const [pwCurrent, setPwCurrent] = useState('')
+  const [pwNew, setPwNew] = useState('')
+  const [pwConfirm, setPwConfirm] = useState('')
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwMsg, setPwMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+  const [showPw, setShowPw] = useState(false)
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName ?? '')
+      setLastName(user.lastName ?? '')
+    }
+  }, [user?.id])
 
   useEffect(() => {
     if (!isLoaded || !user?.id) {
@@ -65,9 +78,7 @@ export default function ProfilePage() {
         }
       }
     })()
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [isLoaded, user?.id])
 
   const handleSaveBio = async () => {
@@ -82,7 +93,7 @@ export default function ProfilePage() {
   }
 
   const handleAddTodo = async () => {
-    if (!user?.id) return
+    if (!user?.id || !todoInput.trim()) return
     const t = await addTodo(user.id, todoInput)
     if (t) {
       setTodos((prev) => [...prev, t])
@@ -102,6 +113,46 @@ export default function ProfilePage() {
     setTodos((prev) => prev.filter((x) => x.id !== id))
   }
 
+  const handleSaveName = async () => {
+    if (!user) return
+    setNameSaving(true)
+    setNameMsg(null)
+    try {
+      await user.update({ firstName: firstName.trim(), lastName: lastName.trim() })
+      try { await user.reload() } catch { /* ignore */ }
+      setNameMsg({ type: 'ok', text: 'Name updated!' })
+    } catch (err: unknown) {
+      setNameMsg({ type: 'err', text: err instanceof Error ? err.message : 'Could not update name.' })
+    } finally {
+      setNameSaving(false)
+    }
+  }
+
+  const handleChangePassword = async () => {
+    if (!user) return
+    setPwMsg(null)
+    if (!pwNew || pwNew.length < 8) {
+      setPwMsg({ type: 'err', text: 'New password must be at least 8 characters.' })
+      return
+    }
+    if (pwNew !== pwConfirm) {
+      setPwMsg({ type: 'err', text: 'Passwords do not match.' })
+      return
+    }
+    setPwSaving(true)
+    try {
+      await user.updatePassword({ currentPassword: pwCurrent, newPassword: pwNew })
+      setPwMsg({ type: 'ok', text: 'Password changed!' })
+      setPwCurrent('')
+      setPwNew('')
+      setPwConfirm('')
+    } catch (err: unknown) {
+      setPwMsg({ type: 'err', text: err instanceof Error ? err.message : 'Could not change password.' })
+    } finally {
+      setPwSaving(false)
+    }
+  }
+
   const handlePhotoSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !user) return
@@ -119,14 +170,9 @@ export default function ProfilePage() {
     setPhotoBusy(true)
     try {
       await user.setProfileImage({ file })
-      try {
-        await user.reload()
-      } catch {
-        /* Image often updates without reload; ignore reload failures */
-      }
+      try { await user.reload() } catch { /* ignore */ }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Could not update your photo.'
-      setPhotoErr(msg)
+      setPhotoErr(err instanceof Error ? err.message : 'Could not update your photo.')
     } finally {
       setPhotoBusy(false)
       e.target.value = ''
@@ -150,14 +196,10 @@ export default function ProfilePage() {
         <h1 className="text-3xl font-extrabold text-dark-text-primary mb-2">Your profile</h1>
         <p className="text-dark-text-secondary mb-6 text-lg">Sign in to set your bio, to-dos, and profile photo.</p>
         <SignInButton mode="modal">
-          <button type="button" className="btn-primary px-8 py-3">
-            Sign in
-          </button>
+          <button type="button" className="btn-primary px-8 py-3">Sign in</button>
         </SignInButton>
         <p className="mt-6 text-sm text-dark-text-muted">
-          <Link href="/" className="text-dark-accent-blue font-bold hover:underline">
-            Back to home
-          </Link>
+          <Link href="/" className="text-dark-accent-blue font-bold hover:underline">Back to home</Link>
         </p>
       </div>
     )
@@ -178,12 +220,15 @@ export default function ProfilePage() {
         </Link>
         <h1 className="text-4xl font-extrabold text-dark-text-primary tracking-tight">Profile</h1>
         <p className="text-dark-text-secondary mt-2 text-lg max-w-xl">
-          Your NestWise space — photo, bio, tasks, and account settings in one place.
+          Your NestWise space — photo, bio, tasks, and account settings.
         </p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
+        {/* ── Left column ── */}
         <div className="space-y-6">
+
+          {/* Profile picture */}
           <div className="card border-2 border-dark-accent-blue/25 bg-gradient-to-br from-dark-card to-dark-surface/80">
             <p className="text-xs font-bold uppercase tracking-wide text-dark-accent-blue mb-4">Profile picture</p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
@@ -191,14 +236,7 @@ export default function ProfilePage() {
                 <div className="absolute inset-0 rounded-full bg-dark-accent-green/20 blur-xl scale-110" aria-hidden />
                 {user.imageUrl ? (
                   <div className="relative w-28 h-28 rounded-full overflow-hidden border-4 border-dark-accent-green shadow-playful ring-4 ring-dark-accent-blue/20">
-                    <Image
-                      src={user.imageUrl}
-                      alt=""
-                      width={112}
-                      height={112}
-                      className="object-cover"
-                      unoptimized
-                    />
+                    <Image src={user.imageUrl} alt="" width={112} height={112} className="object-cover" unoptimized />
                   </div>
                 ) : (
                   <div className="relative w-28 h-28 rounded-full bg-dark-surface border-4 border-dashed border-dark-border flex items-center justify-center text-3xl font-extrabold text-dark-text-primary ring-4 ring-dark-accent-blue/15">
@@ -208,7 +246,7 @@ export default function ProfilePage() {
               </div>
               <div className="flex-1 text-center sm:text-left space-y-3">
                 <p className="text-dark-text-secondary text-sm leading-relaxed">
-                  Choose a clear face or avatar — it shows in the header and here. JPG, PNG, or WebP, up to 8MB.
+                  JPG, PNG, or WebP, up to 8MB. Shows in the header and here.
                 </p>
                 <input
                   ref={fileInputRef}
@@ -230,6 +268,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Bio */}
           <div className="card">
             <h2 className="text-xl font-extrabold text-dark-text-primary mb-1">About you</h2>
             <p className="text-dark-text-muted text-sm mb-4">
@@ -242,7 +281,7 @@ export default function ProfilePage() {
                 <textarea
                   value={bioDraft}
                   onChange={(e) => setBioDraft(e.target.value.slice(0, 2000))}
-                  placeholder="What are you learning? Any money goals you’re proud of?"
+                  placeholder="What are you learning? Any money goals you're proud of?"
                   rows={4}
                   className="w-full px-4 py-3 rounded-xl bg-dark-surface border-2 border-dark-border text-dark-text-primary placeholder-dark-text-muted text-sm resize-y min-h-[110px] focus:border-dark-accent-green focus:outline-none transition-colors"
                 />
@@ -261,6 +300,7 @@ export default function ProfilePage() {
             )}
           </div>
 
+          {/* To-dos */}
           <div className="card border-2 border-dark-accent-green/20">
             <div className="flex items-center gap-2 mb-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-dark-accent-green/15 text-dark-accent-green">
@@ -269,7 +309,7 @@ export default function ProfilePage() {
               <h2 className="text-xl font-extrabold text-dark-text-primary">To-dos</h2>
             </div>
             <p className="text-dark-text-muted text-sm mb-4">
-              Your personal checklist — finish a lesson, review your portfolio, whatever helps you stay on track.
+              Your personal checklist — finish a lesson, review your portfolio, whatever.
             </p>
             <div className="flex gap-2 mb-4">
               <input
@@ -307,11 +347,7 @@ export default function ProfilePage() {
                     >
                       {todo.done && <NestWiseIcon name="check" size={14} className="text-white" />}
                     </button>
-                    <span
-                      className={`flex-1 text-sm pt-0.5 font-medium ${
-                        todo.done ? 'text-dark-text-muted line-through' : 'text-dark-text-primary'
-                      }`}
-                    >
+                    <span className={`flex-1 text-sm pt-0.5 font-medium ${todo.done ? 'text-dark-text-muted line-through' : 'text-dark-text-primary'}`}>
                       {todo.title}
                     </span>
                     <button
@@ -329,21 +365,170 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="card p-0 overflow-hidden border-2 border-dark-border">
-            <div className="px-5 pt-6 pb-3 border-b border-dark-border bg-dark-surface/40">
-              <h2 className="text-xl font-extrabold text-dark-text-primary">Account &amp; security</h2>
-              <p className="text-dark-text-secondary text-sm mt-1 leading-relaxed">
-                Name, email, password, and connected accounts. Use the built-in Clerk panel below — it’s the same data
-                as “Change photo” above, just with more options.
-              </p>
+        {/* ── Right column ── */}
+        <div className="space-y-6">
+
+          {/* Account info */}
+          <div className="card border-2 border-dark-border">
+            <div className="flex items-center gap-2 mb-5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-dark-accent-blue/15 text-dark-accent-blue">
+                <NestWiseIcon name="user" size={20} />
+              </span>
+              <h2 className="text-xl font-extrabold text-dark-text-primary">Account info</h2>
             </div>
-            <div className="p-3 sm:p-5 w-full min-w-0 overflow-x-auto bg-dark-bg/50">
-              <div className="w-full min-w-[min(100%,320px)] max-w-[440px] mx-auto [&_.cl-rootBox]:!w-full">
-                <UserProfile path="/profile" routing="path" />
+
+            {/* Email — read-only */}
+            <div className="mb-4">
+              <label className="block text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-1.5">Email</label>
+              <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-dark-surface border-2 border-dark-border">
+                <NestWiseIcon name="mail" size={16} className="text-dark-text-muted shrink-0" />
+                <span className="text-sm text-dark-text-secondary truncate">
+                  {user.primaryEmailAddress?.emailAddress ?? '—'}
+                </span>
+                {user.primaryEmailAddress && (
+                  <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-dark-accent-green/15 text-dark-accent-green font-semibold shrink-0">
+                    Verified
+                  </span>
+                )}
               </div>
             </div>
+
+            {/* Username — show if set */}
+            {user.username && (
+              <div className="mb-4">
+                <label className="block text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-1.5">Username</label>
+                <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-dark-surface border-2 border-dark-border">
+                  <NestWiseIcon name="at-sign" size={16} className="text-dark-text-muted shrink-0" />
+                  <span className="text-sm text-dark-text-secondary">@{user.username}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Display name — editable */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-1.5">Display name</label>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs text-dark-text-muted mb-1">First</label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => { setFirstName(e.target.value); setNameMsg(null) }}
+                    placeholder="First name"
+                    className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border-2 border-dark-border text-dark-text-primary placeholder-dark-text-muted text-sm focus:border-dark-accent-green focus:outline-none transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-dark-text-muted mb-1">Last</label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => { setLastName(e.target.value); setNameMsg(null) }}
+                    placeholder="Last name"
+                    className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border-2 border-dark-border text-dark-text-primary placeholder-dark-text-muted text-sm focus:border-dark-accent-green focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+              {nameMsg && (
+                <p className={`text-sm font-medium mb-2 ${nameMsg.type === 'ok' ? 'text-dark-accent-green' : 'text-red-400'}`}>
+                  {nameMsg.type === 'ok' ? '✓ ' : ''}{nameMsg.text}
+                </p>
+              )}
+              <button
+                type="button"
+                onClick={handleSaveName}
+                disabled={nameSaving || (firstName === (user.firstName ?? '') && lastName === (user.lastName ?? ''))}
+                className="btn-primary text-sm px-5 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {nameSaving ? 'Saving…' : 'Save name'}
+              </button>
+            </div>
           </div>
+
+          {/* Change password */}
+          <div className="card border-2 border-dark-border">
+            <div className="flex items-center gap-2 mb-5">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-dark-accent-green/15 text-dark-accent-green">
+                <NestWiseIcon name="lock" size={20} />
+              </span>
+              <h2 className="text-xl font-extrabold text-dark-text-primary">Change password</h2>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-1.5">Current password</label>
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  value={pwCurrent}
+                  onChange={(e) => { setPwCurrent(e.target.value); setPwMsg(null) }}
+                  placeholder="Enter current password"
+                  className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border-2 border-dark-border text-dark-text-primary placeholder-dark-text-muted text-sm focus:border-dark-accent-green focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-1.5">New password</label>
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  value={pwNew}
+                  onChange={(e) => { setPwNew(e.target.value); setPwMsg(null) }}
+                  placeholder="At least 8 characters"
+                  className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border-2 border-dark-border text-dark-text-primary placeholder-dark-text-muted text-sm focus:border-dark-accent-green focus:outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-1.5">Confirm new password</label>
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  value={pwConfirm}
+                  onChange={(e) => { setPwConfirm(e.target.value); setPwMsg(null) }}
+                  placeholder="Repeat new password"
+                  className="w-full px-4 py-2.5 rounded-xl bg-dark-surface border-2 border-dark-border text-dark-text-primary placeholder-dark-text-muted text-sm focus:border-dark-accent-green focus:outline-none transition-colors"
+                />
+              </div>
+
+              <label className="flex items-center gap-2 cursor-pointer select-none w-fit">
+                <input
+                  type="checkbox"
+                  checked={showPw}
+                  onChange={() => setShowPw((v) => !v)}
+                  className="rounded border-dark-border accent-dark-accent-green w-4 h-4"
+                />
+                <span className="text-sm text-dark-text-muted">Show passwords</span>
+              </label>
+
+              {pwMsg && (
+                <p className={`text-sm font-medium ${pwMsg.type === 'ok' ? 'text-dark-accent-green' : 'text-red-400'}`}>
+                  {pwMsg.type === 'ok' ? '✓ ' : ''}{pwMsg.text}
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={handleChangePassword}
+                disabled={pwSaving || !pwCurrent || !pwNew || !pwConfirm}
+                className="btn-primary text-sm px-5 py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {pwSaving ? 'Changing…' : 'Change password'}
+              </button>
+            </div>
+          </div>
+
+          {/* Advanced */}
+          <div className="card border-2 border-dark-border/50 bg-dark-surface/30">
+            <p className="text-xs font-bold uppercase tracking-wide text-dark-text-muted mb-3">Advanced</p>
+            <button
+              type="button"
+              onClick={() => openUserProfile()}
+              className="btn-secondary text-sm px-5 py-2.5 flex items-center gap-2"
+            >
+              <NestWiseIcon name="settings" size={16} />
+              Manage connected accounts &amp; 2FA
+            </button>
+            <p className="text-xs text-dark-text-muted mt-2 leading-relaxed">
+              Opens a panel for OAuth connections, two-factor auth, and linked social accounts.
+            </p>
+          </div>
+
         </div>
       </div>
     </div>

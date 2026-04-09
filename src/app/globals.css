@@ -2,6 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes nestwise-money-fall {
+  0% {
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 115vh, 0) rotate(720deg);
+    opacity: 0.88;
+  }
+}
+
+@keyframes nestwise-fade-slide {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes nestwise-twinkle-icon {
+  0%   { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)) brightness(1); }
+  25%  { filter: drop-shadow(0 0 8px var(--glow, rgba(255,220,60,0.9))) brightness(1.6); }
+  50%  { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)) brightness(1); }
+  75%  { filter: drop-shadow(0 0 12px var(--glow, rgba(255,220,60,0.9))) brightness(1.85); }
+  100% { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.3)) brightness(1); }
+}
+
 @layer base {
   /* Do not set border-color on * — it breaks Clerk and other embedded UIs. Use .border-dark-border on components. */
 
@@ -9,8 +33,9 @@
     color-scheme: light;
   }
 
+  html.light,
   html.light body {
-    background-color: #f8fafc;
+    background-color: #f5f7fa;
     color: #0f172a;
   }
 
@@ -20,7 +45,7 @@
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
   }
 
-  html.light .bg-dark-bg { background-color: #f8fafc; }
+  html.light .bg-dark-bg { background-color: #f5f7fa; }
   html.light .bg-dark-surface { background-color: #f1f5f9; }
   html.light .bg-dark-card { background-color: #fff; }
   html.light .border-dark-border { border-color: #e2e8f0; }
@@ -31,7 +56,7 @@
   html.light .bg-dark-accent-green { background-color: #58cc02; }
   html.light .hover\:bg-dark-accent-green\/90:hover { background-color: #46a302; }
   html.light .border-dark-accent-green-dark { border-color: #46a302; }
-  html.light nav { border-color: #e2e8f0; background-color: rgba(255, 255, 255, 0.85); }
+  html.light nav { border-color: #e2e8f0; background-color: rgba(255, 255, 255, 0.88); backdrop-filter: blur(12px); }
 
   /*
    * Opacity utilities on dark.* still use #1f1f1f — in light mode that reads as dingy gray.
@@ -66,22 +91,99 @@
     background-color: rgba(15, 23, 42, 0.05);
   }
 
+  /* ---- Light-mode: buttons, cards, nav, interactive elements ---- */
+  html.light .btn-primary {
+    box-shadow: 0 2px 0 0 #3d8c02;
+  }
+  html.light .btn-secondary {
+    background-color: #fff;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
+  html.light .btn-secondary:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+  }
+  html.light .shadow-playful-sm {
+    box-shadow: 0 2px 0 0 rgba(15, 23, 42, 0.08);
+  }
+  html.light .shadow-playful {
+    box-shadow: 0 4px 0 0 rgba(15, 23, 42, 0.08);
+  }
+  html.light .interactive-pop:hover {
+    box-shadow:
+      0 0 0 1px rgba(88, 204, 2, 0.25),
+      0 0 20px rgba(88, 204, 2, 0.18),
+      0 8px 20px rgba(15, 23, 42, 0.1);
+  }
+  html.light .nav-pop:hover {
+    box-shadow:
+      0 0 0 1px rgba(88, 204, 2, 0.2),
+      0 0 14px rgba(88, 204, 2, 0.16);
+    background-color: rgba(88, 204, 2, 0.07);
+  }
+  html.light .card {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  /* Light-mode input fields */
+  html.light input[type="text"],
+  html.light input[type="number"],
+  html.light input[type="search"],
+  html.light textarea,
+  html.light select {
+    background-color: #fff;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
+  html.light input::placeholder,
+  html.light textarea::placeholder {
+    color: #94a3b8;
+  }
+
+  /* Accent green opacity variants in light mode */
+  html.light .bg-dark-accent-green\/10 { background-color: rgba(88, 204, 2, 0.08); }
+  html.light .bg-dark-accent-green\/15 { background-color: rgba(88, 204, 2, 0.1); }
+  html.light .bg-dark-accent-green\/20 { background-color: rgba(88, 204, 2, 0.12); }
+  html.light .bg-dark-accent-green\/30 { background-color: rgba(88, 204, 2, 0.15); }
+  html.light .ring-dark-accent-green\/25 { --tw-ring-color: rgba(88, 204, 2, 0.2); }
+  html.light .ring-dark-accent-green\/30 { --tw-ring-color: rgba(88, 204, 2, 0.22); }
+  html.light .text-dark-accent-green { color: #3d8c02; }
+  html.light .drop-shadow-\[0_0_18px_rgba\(88\,204\,2\,0\.55\)\] {
+    filter: drop-shadow(0 0 14px rgba(61, 140, 2, 0.45));
+  }
+  html.light .text-dark-accent-blue { color: #0284c7; }
+  html.light .border-dark-accent-green { border-color: #58cc02; }
+  html.light .border-dark-accent-green-dark { border-color: #3d8c02; }
+
+  /* Mute inner shadows in light mode */
+  html.light .shadow-inner {
+    --tw-shadow: inset 0 2px 4px 0 rgba(15, 23, 42, 0.04);
+  }
+
+  /* Focus rings */
+  html.light .focus\:ring-dark-accent-green:focus { --tw-ring-color: #58cc02; }
+  html.light .ring-dark-accent-green { --tw-ring-color: #58cc02; }
+
+  /* Feature card hover glow in light mode (softer than dark) */
+  html.light .hover\:shadow-\[0_12px_40px_-8px_rgba\(88\,204\,2\,0\.22\)\]:hover {
+    box-shadow: 0 8px 30px -8px rgba(88, 204, 2, 0.15);
+  }
+
+  /* Skeleton shimmer in light mode */
+  html.light .animate-pulse {
+    background-color: #e2e8f0;
+  }
+
+  /* Border-t / border-b sections */
+  html.light .border-dark-border { border-color: #e2e8f0; }
+
   body {
     @apply bg-dark-bg text-dark-text-primary;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .home-hero-animate-title,
-    .home-hero-animate-sub,
-    .home-feature-animate,
-    .home-cta-animate {
-      opacity: 1 !important;
-      transform: none !important;
-      animation: none !important;
-    }
-  }
 }
 
 @layer components {

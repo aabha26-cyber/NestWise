@@ -3,12 +3,18 @@
 import { useEffect } from 'react'
 import { ClerkProvider } from '@clerk/nextjs'
 import { nestWiseClerkAppearance } from '@/lib/clerkAppearance'
+import { MoneyRainGate } from '@/components/MoneyRain'
 
 function ThemeSync() {
   useEffect(() => {
-    const theme = typeof window !== 'undefined' ? localStorage.getItem('nestwise_theme') : null
-    if (theme === 'light') document.documentElement.classList.add('light')
-    else document.documentElement.classList.remove('light')
+    /* The blocking <script> in layout.tsx already applied the correct theme class
+       before first paint. This effect only runs as a safety-net: if somehow neither
+       class is present (e.g. SSR-only render with no JS), default to dark. */
+    const html = document.documentElement
+    if (!html.classList.contains('light') && !html.classList.contains('dark')) {
+      const saved = localStorage.getItem('nestwise_theme')
+      html.classList.add(saved === 'light' ? 'light' : 'dark')
+    }
   }, [])
   return null
 }
@@ -17,6 +23,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider appearance={nestWiseClerkAppearance}>
       <ThemeSync />
+      <MoneyRainGate />
       {children}
     </ClerkProvider>
   )

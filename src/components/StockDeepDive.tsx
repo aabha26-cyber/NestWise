@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getChartTheme } from '@/lib/chartTheme'
 import { Line } from 'react-chartjs-2'
 import {
   Chart as ChartJS,
@@ -86,6 +87,7 @@ export default function StockDeepDive({ stock }: { stock: StockData }) {
     ],
   }
 
+  const ct = getChartTheme()
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -96,11 +98,7 @@ export default function StockDeepDive({ stock }: { stock: StockData }) {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#1f1f1f',
-        titleColor: '#f5f5f5',
-        bodyColor: '#a0a0a0',
-        borderColor: '#2a2a2a',
-        borderWidth: 1,
+        ...ct.tooltip,
         callbacks: {
           label: (ctx: TooltipItem<'line'>) => {
             const y = ctx.parsed.y
@@ -112,13 +110,13 @@ export default function StockDeepDive({ stock }: { stock: StockData }) {
     },
     scales: {
       x: {
-        grid: { color: '#2a2a2a' },
-        ticks: { color: '#6b6b6b', maxTicksLimit: 8 },
+        grid: { color: ct.grid },
+        ticks: { color: ct.ticks, maxTicksLimit: 8 },
       },
       y: {
-        grid: { color: '#2a2a2a' },
+        grid: { color: ct.grid },
         ticks: {
-          color: '#6b6b6b',
+          color: ct.ticks,
           callback: (v: string | number) => '$' + Number(v).toFixed(0),
         },
       },

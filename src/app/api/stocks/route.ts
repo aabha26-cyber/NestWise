@@ -2,27 +2,31 @@ import { NextRequest, NextResponse } from 'next/server'
 
 // Server-side Yahoo Finance fetch (no CORS)
 async function fetchYahooChart(symbol: string) {
-  const res = await fetch(
-    `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
-    { next: { revalidate: 300 } }
-  )
-  if (!res.ok) return null
-  const data = await res.json()
-  const result = data.chart?.result?.[0]
-  if (!result) return null
-  const meta = result.meta
-  const currentPrice = meta.regularMarketPrice || meta.previousClose || 0
-  const previousClose = meta.previousClose || currentPrice
-  const change = currentPrice - previousClose
-  const changePercent = previousClose ? (change / previousClose) * 100 : 0
-  return {
-    symbol: meta.symbol,
-    name: meta.longName || meta.shortName || symbol,
-    price: currentPrice,
-    change,
-    changePercent,
-    description: undefined as string | undefined,
-    whyInvest: undefined as string | undefined,
+  try {
+    const res = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
+      { next: { revalidate: 300 } }
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    const result = data.chart?.result?.[0]
+    if (!result) return null
+    const meta = result.meta
+    const currentPrice = meta.regularMarketPrice || meta.previousClose || 0
+    const previousClose = meta.previousClose || currentPrice
+    const change = currentPrice - previousClose
+    const changePercent = previousClose ? (change / previousClose) * 100 : 0
+    return {
+      symbol: meta.symbol,
+      name: meta.longName || meta.shortName || symbol,
+      price: currentPrice,
+      change,
+      changePercent,
+      description: undefined as string | undefined,
+      whyInvest: undefined as string | undefined,
+    }
+  } catch {
+    return null
   }
 }
 
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
   const symbolsParam = searchParams.get('symbols')
 
   if (symbolsParam) {
-    const symbols = symbolsParam.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean)
+    const symbols = symbolsParam.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean).slice(0, 50)
     if (symbols.length === 0) {
       return NextResponse.json({ stocks: [] })
     }

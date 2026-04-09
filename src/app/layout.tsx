@@ -11,9 +11,9 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'NestWise — Learn money skills, practice with a simulator, ask AI',
+  title: 'NestWise · Your finance journey made easy',
   description:
-    'Learn how money works, practice investing with virtual cash, and get plain-English answers—all in one free app. No real money. Educational only, not financial advice.',
+    'Short lessons, a practice portfolio, and educational Q&A. No real money. Not financial advice.',
 }
 
 export default function RootLayout({
@@ -22,11 +22,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`dark ${nunito.variable}`}>
-      <body className={`min-h-screen bg-dark-bg font-sans antialiased ${nunito.className}`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Blocking script: runs before first paint so theme class is set before React hydrates.
+            Must not set className on <html> — React reconciliation would strip the injected class. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('nestwise_theme');if(t==='light'){document.documentElement.classList.add('light')}else{document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}})()`,
+          }}
+        />
+      </head>
+      <body className={`min-h-screen bg-dark-bg font-sans antialiased ${nunito.variable} ${nunito.className}`}>
         <Providers>
           <Navigation />
-          <main>{children}</main>
+          <main className="relative z-20">{children}</main>
         </Providers>
       </body>
     </html>

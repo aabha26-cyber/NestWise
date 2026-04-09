@@ -35,6 +35,7 @@ import {
 import { getSectorBreakdown, getPortfolioRiskScore } from '@/lib/sectors'
 import { format } from 'date-fns'
 import { IconOrb, NestWiseIcon } from '@/components/NestWiseIcon'
+import { getChartTheme } from '@/lib/chartTheme'
 
 ChartJS.register(
   CategoryScale,
@@ -419,36 +420,30 @@ export default function Dashboard() {
     }
   }, [chartTimeframe, isLocalSim, user?.id])
 
-  const chartOptions = useMemo(
-    () => ({
+  const chartOptions = useMemo(() => {
+    const ct = getChartTheme()
+    return {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1f1f1f',
-          titleColor: '#f5f5f5',
-          bodyColor: '#a0a0a0',
-          borderColor: '#2a2a2a',
-          borderWidth: 1,
-        },
+        tooltip: ct.tooltip,
       },
       scales: {
         x: {
-          grid: { color: '#2a2a2a' },
-          ticks: { color: '#6b6b6b' },
+          grid: { color: ct.grid },
+          ticks: { color: ct.ticks },
         },
         y: {
-          grid: { color: '#2a2a2a' },
+          grid: { color: ct.grid },
           ticks: {
-            color: '#6b6b6b',
+            color: ct.ticks,
             callback: (value: unknown) => '$' + Number(value).toLocaleString(),
           },
         },
       },
-    }),
-    []
-  )
+    }
+  }, [])
 
   const totalGainLoss = realizedGains + unrealizedGains
   const returnPercent = initialCash > 0 ? (totalGainLoss / initialCash) * 100 : 0

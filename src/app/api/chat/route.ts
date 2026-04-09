@@ -35,9 +35,15 @@ export async function POST(request: NextRequest) {
 
     const openai = new OpenAI({ apiKey })
 
-    const { messages } = await request.json()
+    const body = await request.json()
+    const messages = body?.messages
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
+      return NextResponse.json(
+        { error: 'Invalid messages format.' },
+        { status: 400 }
+      )
+    }
 
-    // Add system prompt to the beginning of messages
     const messagesWithSystem = [
       { role: 'system', content: SYSTEM_PROMPT },
       ...messages,

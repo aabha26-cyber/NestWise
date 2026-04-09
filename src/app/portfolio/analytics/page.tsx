@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useUser } from '@clerk/nextjs'
+import { getChartTheme } from '@/lib/chartTheme'
 import { getOrCreatePortfolio, getHoldings, getPortfolioHistory } from '@/lib/portfolio'
 import { getMultipleStocks, type StockData } from '@/lib/stockApi'
 import { Line } from 'react-chartjs-2'
@@ -136,28 +137,23 @@ export default function AnalyticsPage() {
     )
   }
 
+  const ct = getChartTheme()
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
-      tooltip: {
-        backgroundColor: '#1f1f1f',
-        titleColor: '#f5f5f5',
-        bodyColor: '#a0a0a0',
-        borderColor: '#2a2a2a',
-        borderWidth: 1,
-      },
+      tooltip: ct.tooltip,
     },
     scales: {
       x: {
-        grid: { color: '#2a2a2a' },
-        ticks: { color: '#6b6b6b' },
+        grid: { color: ct.grid },
+        ticks: { color: ct.ticks },
       },
       y: {
-        grid: { color: '#2a2a2a' },
+        grid: { color: ct.grid },
         ticks: {
-          color: '#6b6b6b',
+          color: ct.ticks,
           callback: function (value: any) {
             return '$' + value.toLocaleString()
           },
